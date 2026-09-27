@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-Fit Sports - 장애인 체육시설 통합 플랫폼</title>
+    <title>All-Fit Sports - 배리어프리 체육시설 통합 플랫폼</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Kakao Maps SDK (정적 표준 로드 방식) -->
+    <!-- Kakao Maps SDK -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c5fcde2a37955d200e85806d94a2a4a4&libraries=services"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -19,50 +21,100 @@
     <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2 cursor-pointer">
-                <span class="text-2xl font-black text-blue-600">All-Fit</span>
-                <span class="text-sm font-semibold text-slate-500">배리어프리 체육시설 통합 플랫폼</span>
+                <div class="bg-blue-600 text-white font-black px-2.5 py-1 rounded-xl text-lg">AF</div>
+                <span class="text-xl font-black text-slate-900 tracking-tight">All-Fit Sports</span>
+                <span class="hidden sm:inline-block text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">배리어프리 통합 플랫폼</span>
             </div>
-            <div class="text-xs text-slate-500 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium">
-                🟢 공공데이터 실시간 연동중
+            <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                실시간 공공데이터 연동완료
             </div>
         </div>
     </header>
 
     <!-- 메인 대시보드 콘텐츠 -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div>
-                <h1 class="text-2xl font-extrabold text-slate-900">전국 장애인 체육시설 찾기</h1>
-                <p class="text-sm text-slate-500 mt-1">대한장애인체육회 공공데이터와 카카오맵을 연동하여 전국의 배리어프리 체육시설을 안내합니다.</p>
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+        
+        <!-- 검색 및 필터 컨트롤 패널 -->
+        <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">전국 장애인 체육시설 맞춤 검색</h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">지역, 시설명, 바우처 및 반다비 센터 여부를 조건별로 편리하게 검색하세요.</p>
+                </div>
+                <div id="facilityCount" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
+                    데이터 불러오는 중...
+                </div>
             </div>
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <select id="regionFilter" onchange="filterFacilities()" class="border border-slate-300 rounded-xl px-4 py-2.5 text-sm bg-white font-medium focus:outline-none focus:border-blue-500 w-full md:w-48">
-                    <option value="">전체 지역 보기</option>
-                    <option value="서울">서울특별시</option>
-                    <option value="경기">경기도</option>
-                    <option value="부산">부산광역시</option>
-                    <option value="인천">인천광역시</option>
-                    <option value="대구">대구광역시</option>
-                    <option value="대전">대전광역시</option>
-                    <option value="광주">광주광역시</option>
-                </select>
-            </div>
-        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[600px] relative">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
+                <!-- 지역 선택 -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">지역별 필터</label>
+                    <select id="regionFilter" onchange="filterAndRender()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
+                        <option value="">전체 지역 (시/도)</option>
+                        <option value="서울">서울특별시</option>
+                        <option value="경기">경기도</option>
+                        <option value="부산">부산광역시</option>
+                        <option value="인천">인천광역시</option>
+                        <option value="대구">대구광역시</option>
+                        <option value="대전">대전광역시</option>
+                        <option value="광주">광주광역시</option>
+                        <option value="울산">울산광역시</option>
+                        <option value="강원">강원특별자치도</option>
+                        <option value="충북">충청북도</option>
+                        <option value="충남">충청남도</option>
+                        <option value="전북">전북특별자치도</option>
+                        <option value="전남">전라남도</option>
+                        <option value="경북">경상북도</option>
+                        <option value="경남">경상남도</option>
+                        <option value="제주">제주특별자치도</option>
+                    </select>
+                </div>
+
+                <!-- 시설명 검색 -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">시설명 검색</label>
+                    <input type="text" id="searchInput" oninput="filterAndRender()" placeholder="예: 체육센터, 수영장" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
+                </div>
+
+                <!-- 바우처 시설 여부 -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">스포츠강좌 바우처</label>
+                    <select id="voucherFilter" onchange="filterAndRender()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
+                        <option value="">전체보기</option>
+                        <option value="Y">바우처 지정 시설만</option>
+                    </select>
+                </div>
+
+                <!-- 반다비 체육센터 여부 -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">반다비 체육센터</label>
+                    <select id="bandabiFilter" onchange="filterAndRender()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
+                        <option value="">전체보기</option>
+                        <option value="Y">반다비 센터만</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- 메인 디스플레이 (지도 + 리스트) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 지도 영역 -->
+            <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[550px] lg:h-[650px] relative">
                 <div id="map" class="w-full h-full"></div>
             </div>
             
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-[600px] flex flex-col">
+            <!-- 리스트 영역 -->
+            <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-[550px] lg:h-[650px] flex flex-col">
                 <div class="mb-3 pb-2 border-b border-slate-100 flex justify-between items-center">
-                    <span class="text-sm font-bold text-slate-700">검색된 시설 목록</span>
-                    <span id="facilityCount" class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded">불러오는 중...</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">검색된 시설 리스트</span>
+                    <span class="text-[11px] text-slate-400">카드를 누르면 지도 위치로 이동합니다</span>
                 </div>
-                <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="facilityList">
+                <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                        공공데이터와 지도를 불러오는 중입니다...
+                        공공데이터와 시설 정보를 분석 중입니다...
                     </div>
                 </div>
             </div>
@@ -70,29 +122,17 @@
     </main>
 
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-8">
-        &copy; 2026 All-Fit Sports. All rights reserved.
+        &copy; 2026 All-Fit Sports. All rights reserved. Designed for barrier-free accessibility.
     </footer>
 
     <!-- 자바스크립트 로직 -->
     <script>
         let map = null;
         let markers = [];
-        let facilitiesData = [];
+        let allFacilities = [];
 
-        // 페이지 로드 시 카카오맵 객체 검증 후 즉시 초기화
         window.onload = function() {
-            if (typeof kakao !== 'undefined' && kakao.maps) {
-                initMap();
-            } else {
-                // 스크립트 로딩 대기
-                setTimeout(() => {
-                    if (typeof kakao !== 'undefined' && kakao.maps) {
-                        initMap();
-                    } else {
-                        document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-16">카카오맵 로드 실패<br>카카오 디벨로퍼스 도메인 설정을 다시 확인해주세요.</div>';
-                    }
-                }, 1000);
-            }
+            initMap();
         };
 
         function initMap() {
@@ -112,7 +152,9 @@
                 
                 if (result && result.data) {
                     const geocoder = new kakao.maps.services.Geocoder();
-                    const targetData = result.data.slice(0, 40);
+                    // 속도 및 안정성을 위해 선두 60개소 우선 지오코딩 처리
+                    const targetData = result.data.slice(0, 60);
+                    let processedCount = 0;
 
                     targetData.forEach((item, index) => {
                         const address = item.소재지;
@@ -121,65 +163,86 @@
                         if (!address) return;
 
                         geocoder.addressSearch(address, function(status, data) {
+                            processedCount++;
                             if (status === kakao.maps.services.Status.OK) {
-                                const lat = data[0].y;
-                                const lng = data[0].x;
-
-                                facilitiesData.push({
+                                allFacilities.push({
                                     id: index + 1,
-                                    name: name,
+                                    name: name || "이름 없는 시설",
                                     region: item.시_도 || "기타",
                                     address: address,
-                                    lat: parseFloat(lat),
-                                    lng: parseFloat(lng),
-                                    phone: item.전화번호 || "번호 없음",
-                                    voucher: item.장애인스포츠강좌바우처시설 || "N",
-                                    bandabi: item.반다비시설 || "N"
+                                    lat: parseFloat(data[0].y),
+                                    lng: parseFloat(data[0].x),
+                                    phone: item.전화번호 || "문의 전화 없음",
+                                    voucher: item.장애인스포츠강좌바우처시설 === "Y" ? "Y" : "N",
+                                    bandabi: item.반다비시설 === "Y" ? "Y" : "N"
                                 });
-
-                                renderFacilities();
+                            }
+                            // 데이터 적재 완료 시점 또는 일정 단위마다 렌더링
+                            if (processedCount >= targetData.length || allFacilities.length >= 15) {
+                                filterAndRender();
                             }
                         });
                     });
                 }
             } catch (e) {
                 console.error("데이터 로드 실패:", e);
-                document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-16">데이터를 불러오지 못했습니다.</div>';
+                document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-20">공공데이터를 불러오지 못했습니다.</div>';
             }
         }
 
-        function renderFacilities(filterRegion = "") {
+        function filterAndRender() {
+            const regionVal = document.getElementById('regionFilter').value;
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+            const voucherVal = document.getElementById('voucherFilter').value;
+            const bandabiVal = document.getElementById('bandabiFilter').value;
+
+            const filtered = allFacilities.filter(f => {
+                const matchRegion = regionVal ? f.region.includes(regionVal) : true;
+                const matchSearch = searchVal ? f.name.toLowerCase().includes(searchVal) || f.address.toLowerCase().includes(searchVal) : true;
+                const matchVoucher = voucherVal ? f.voucher === voucherVal : true;
+                const matchBandabi = bandabiVal ? f.bandabi === bandabiVal : true;
+                return matchRegion && matchSearch && matchVoucher && matchBandabi;
+            });
+
+            document.getElementById('facilityCount').innerText = `검색 결과: ${filtered.length}개소`;
+            renderListAndMarkers(filtered);
+        }
+
+        function renderListAndMarkers(list) {
             const listContainer = document.getElementById('facilityList');
             listContainer.innerHTML = '';
 
             markers.forEach(marker => marker.setMap(null));
             markers = [];
 
-            const filteredData = filterRegion 
-                ? facilitiesData.filter(f => f.region.includes(filterRegion))
-                : facilitiesData;
-
-            document.getElementById('facilityCount').innerText = `${filteredData.length}개소`;
-
-            if (filteredData.length === 0) {
-                listContainer.innerHTML = '<div class="text-center text-slate-400 py-16">조건에 맞는 시설이 없습니다.</div>';
+            if (list.length === 0) {
+                listContainer.innerHTML = '<div class="text-center text-slate-400 py-24 text-sm font-medium">조건에 일치하는 체육시설이 없습니다.</div>';
                 return;
             }
 
             const bounds = new kakao.maps.LatLngBounds();
 
-            filteredData.forEach(facility => {
+            list.forEach(facility => {
                 const card = document.createElement('div');
-                card.className = "p-4 border border-slate-100 rounded-xl hover:bg-blue-50/50 hover:border-blue-200 transition cursor-pointer shadow-sm bg-white";
+                card.className = "p-4 border border-slate-100 rounded-xl hover:bg-blue-50/60 hover:border-blue-200 transition cursor-pointer shadow-sm bg-white space-y-2";
+                
+                let badges = `<span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">${facility.region}</span>`;
+                if (facility.voucher === 'Y') {
+                    badges += `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-semibold">바우처시설</span>`;
+                }
+                if (facility.bandabi === 'Y') {
+                    badges += `<span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-semibold">반다비센터</span>`;
+                }
+
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-1">
-                        <h3 class="font-bold text-slate-800 text-sm">${facility.name}</h3>
-                        <span class="text-[11px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">${facility.region}</span>
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="font-bold text-slate-800 text-sm leading-snug">${facility.name}</h3>
+                        <div class="flex flex-wrap gap-1 justify-end">${badges}</div>
                     </div>
-                    <p class="text-xs text-slate-500 mb-2">${facility.address}</p>
-                    <div class="flex gap-3 text-[11px] text-slate-400 font-medium">
+                    <p class="text-xs text-slate-500">${facility.address}</p>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-50">
                         <span>📞 ${facility.phone}</span>
-                        <span>바우처: ${facility.voucher}</span>
+                        <span class="text-blue-600 font-medium">지도 보기 &rarr;</span>
                     </div>
                 `;
                 
@@ -198,14 +261,9 @@
                 bounds.extend(markerPosition);
             });
 
-            if (filteredData.length > 0) {
+            if (list.length > 0) {
                 map.setBounds(bounds);
             }
-        }
-
-        function filterFacilities() {
-            const selectedRegion = document.getElementById('regionFilter').value;
-            renderFacilities(selectedRegion);
         }
     </script>
 </body>
