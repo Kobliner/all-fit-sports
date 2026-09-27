@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome 아이콘 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 카카오맵 API (appkey=YOUR_APP_KEY 부분에 본인의 발급 키를 넣으세요) -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c5fcde2a37955d200e85806d94a2a4a4&libraries=services"></script>
+    <!-- 카카오맵 API (https 명시) -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=c5fcde2a37955d200e85806d94a2a4a4&libraries=services"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Pretendard', sans-serif; }
@@ -332,8 +332,11 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             if (pageId === 'facilities') {
-                initMapIfNeeded();
-                renderFacilities();
+                // DOM이 그려질 수 있도록 약간의 여유를 둔 뒤 지도 초기화 및 렌더링 수행
+                setTimeout(() => {
+                    initMapIfNeeded();
+                    renderFacilities();
+                }, 50);
             } else if (pageId === 'matching') {
                 renderMatching('all');
             }
@@ -341,22 +344,28 @@
 
         // 카카오맵 초기화 함수
         function initMapIfNeeded() {
-            // 카카오 SDK가 로드되었고 AppKey가 정상 입력된 경우 실행
-            if (typeof kakao !== 'undefined' && kakao.maps && !map) {
+            if (typeof kakao !== 'undefined' && kakao.maps) {
                 const container = document.getElementById('map');
-                document.getElementById('map-fallback').style.display = 'none'; // 안내 문구 숨김
                 
-                const options = {
-                    center: new kakao.maps.LatLng(37.5547, 126.9707), // 초기 중심 좌표 (서울 시청/마포 부근)
-                    level: 7
-                };
-                map = new kakao.maps.Map(container, options);
+                if (!map) {
+                    const options = {
+                        center: new kakao.maps.LatLng(37.5547, 126.9707),
+                        level: 7
+                    };
+                    map = new kakao.maps.Map(container, options);
+                } else {
+                    // 이미 생성된 경우 화면 크기 재조정 및 중앙 설정
+                    map.relayout();
+                    map.setCenter(new kakao.maps.LatLng(37.5547, 126.9707));
+                }
+
+                const fallback = document.getElementById('map-fallback');
+                if (fallback) fallback.style.display = 'none';
             }
         }
 
         // 지도에 마커 업데이트 함수
         function updateMapMarkers(filteredList) {
-            // 기존 마커 제거
             markers.forEach(marker => marker.setMap(null));
             markers = [];
 
@@ -372,7 +381,6 @@
                     title: item.name
                 });
 
-                // 마커 클릭 시 상세 모달 연동
                 kakao.maps.event.addListener(marker, 'click', function() {
                     openFacilityModal(item.id);
                 });
@@ -381,7 +389,6 @@
                 bounds.extend(coords);
             });
 
-            // 검색 결과가 있다면 해당 위치들로 지도 범위 재설정
             if (filteredList.length > 0) {
                 map.setBounds(bounds);
             }
@@ -416,7 +423,6 @@
 
             document.getElementById('facility-count').innerText = filtered.length + "개";
 
-            // 지도 마커 동기화 호출
             updateMapMarkers(filtered);
 
             if (filtered.length === 0) {
@@ -446,7 +452,7 @@
             `).join('');
         }
 
-        // 상세 모달 및 매칭 데이터 로직 (기존 유지)
+        // 매칭 데이터 및 모달 로직
         let matchingData = [
             { id: 1, type: "request", title: "주말 수영 강습 동행 및 이동 보조 구합니다", location: "서울 마포구", author: "김지수", status: "매칭 대기중", desc: "주말마다 수영장까지 이동하고 탈의 및 입수를 도와주실 도우미분이 필요합니다." },
             { id: 2, type: "volunteer", title: "주말 헬스 및 운동 보조 자원봉사 가능합니다", location: "서울 강남구", author: "박도준", status: "모집중", desc: "체육 지도자 자격증 보유 중이며, 주말에 헬스 보조 봉사 희망합니다." }
