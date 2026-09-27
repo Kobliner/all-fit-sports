@@ -193,7 +193,7 @@
                     let processedCount = 0;
 
                     rawList.forEach((item, index) => {
-                        const name = item.시설명;
+                        const name = item.시설명 || "";
                         const region = item.시_도 || "기타";
                         const subRegion = item.소재지 || ""; 
                         const keyword = `${region} ${subRegion} ${name}`;
@@ -207,13 +207,31 @@
                                 lng = parseFloat(data[0].x);
                             }
 
-                            // 운영 종목 키워드 자동 추출 (이름, 기관명 기반)
+                            // 종목 키워드 자동 분류 강화 (데이터 분석)
                             const textSource = (name + " " + (item.운영기관 || "")).toLowerCase();
-                            let sports = ["다목적체육관"];
-                            if (textSource.includes("수중") || textSource.includes("수영") || textSource.includes("풀")) sports.push("수영");
-                            if (textSource.includes("재활") || textSource.includes("치료")) sports.push("재활스포츠");
-                            if (textSource.includes("헬스") || textSource.includes("체력") || textSource.includes("체련")) sports.push("헬스/피트니스");
-                            if (textSource.includes("농구") || textSource.includes("구기")) sports.push("구기종목");
+                            let sports = [];
+                            
+                            if (textSource.includes("수영") || textSource.includes("풀") || textSource.includes("수중") || textSource.includes("아쿠아")) {
+                                sports.push("수영");
+                            }
+                            if (textSource.includes("헬스") || textSource.includes("체력") || textSource.includes("피트니스") || textSource.includes("체련")) {
+                                sports.push("헬스/피트니스");
+                            }
+                            if (textSource.includes("다목적") || textSource.includes("체육관") || textSource.includes("실내체육")) {
+                                sports.push("다목적체육관");
+                            }
+                            if (textSource.includes("재활") || textSource.includes("치료") || textSource.includes("의료")) {
+                                sports.push("재활스포츠");
+                            }
+                            if (textSource.includes("농구") || textSource.includes("배구") || textSource.includes("배드민턴") || textSource.includes("탁구")) {
+                                sports.push("구기종목");
+                            }
+
+                            // 만약 위 키워드에 매칭되지 않았다면 시설 기본 성격에 맞춰 기본 종목들 부여
+                            if (sports.length === 0) {
+                                sports.push("다목적체육관");
+                                sports.push("헬스/피트니스");
+                            }
 
                             allFacilities.push({
                                 id: index + 1,
@@ -347,7 +365,7 @@
                 hpContainer.style.display = 'none';
             }
 
-            // 모달 팝업 내 키워드 배지 구성 (요청하신 형식: 지역 / 스포츠 바우처 / 수영 / 종목...)
+            // 모달 팝업 내 키워드 배지 구성 (지역 / 바우처 / 운영 종목 키워드 순서)
             let badgeHtml = `<span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-bold">${facility.region}</span>`;
             if (facility.voucher === 'Y') {
                 badgeHtml += `<span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg font-bold">스포츠 바우처 지정</span>`;
