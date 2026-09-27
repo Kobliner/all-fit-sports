@@ -27,7 +27,7 @@
             </div>
             <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                실시간 공공데이터 연동중
+                실시간 공공데이터 연동완료
             </div>
         </div>
     </header>
@@ -114,7 +114,7 @@
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                        공공데이터와 시설 정보를 분석 중입니다...
+                        공공데이터와 시설 정보를 불러오는 중입니다...
                     </div>
                 </div>
             </div>
@@ -150,44 +150,40 @@
                 const response = await fetch('/api/facilities');
                 const result = await response.json();
                 
-                // 공공데이터포털 응답 구조인 result.data 확인
                 const rawList = result.data || result;
                 if (Array.isArray(rawList) && rawList.length > 0) {
                     const geocoder = new kakao.maps.services.Geocoder();
-                    let processedCount = 0;
-                    // 원활한 지오코딩을 위해 50개소 우선 처리
-                    const targetData = rawList.slice(0, 50);
-
-                    targetData.forEach((item, index) => {
-                        // 공공데이터의 다양한 주소 필드명 호환 처리
+                    
+                    rawList.forEach((item, index) => {
                         const address = item.소재지 || item.도로명주소 || item.지번주소;
                         const name = item.시설명 || item.체육시설명;
                         
-                        if (!address) {
-                            processedCount++;
-                            return;
-                        }
+                        if (!address || !name) return;
 
+                        // 비동기 주소 검색 지연을 줄이기 위해 순차적 처리 대신 안전한 콜백 사용
                         geocoder.addressSearch(address, function(status, data) {
-                            processedCount++;
+                            let lat = 37.566826;
+                            let lng = 126.978656;
+
                             if (status === kakao.maps.services.Status.OK) {
-                                allFacilities.push({
-                                    id: index + 1,
-                                    name: name || "장애인 체육시설",
-                                    region: item.시_도 || item.시도 || "기타",
-                                    address: address,
-                                    lat: parseFloat(data[0].y),
-                                    lng: parseFloat(data[0].x),
-                                    phone: item.전화번호 || item.연락처 || "문의 전화 없음",
-                                    voucher: (item.장애인스포츠강좌바우처시설 === "Y" || item.바우처여부 === "Y") ? "Y" : "N",
-                                    bandabi: (item.반다비시설 === "Y" || item.반다비여부 === "Y") ? "Y" : "N"
-                                });
+                                lat = parseFloat(data[0].y);
+                                lng = parseFloat(data[0].x);
                             }
 
-                            // 일정 이상 수집되었거나 전체 작업이 끝났을 때 렌더링 실행
-                            if (processedCount >= targetData.length || allFacilities.length >= 10) {
-                                filterAndRender();
-                            }
+                            allFacilities.push({
+                                id: index + 1,
+                                name: name,
+                                region: item.시_도 || item.시도 || "기타",
+                                address: address,
+                                lat: lat,
+                                lng: lng,
+                                phone: item.전화번호 || item.연락처 || "문의 전화 없음",
+                                voucher: (item.장애인스포츠강좌바우처시설 === "Y" || item.바우처여부 === "Y") ? "Y" : "N",
+                                bandabi: (item.반다비시설 === "Y" || item.반다비여부 === "Y") ? "Y" : "N"
+                            });
+
+                            // 데이터가 하나씩 쌓일 때마다 실시간 필터 및 렌더링 반영
+                            filterAndRender();
                         });
                     });
                 } else {
