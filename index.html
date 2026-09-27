@@ -43,7 +43,7 @@
                     <p class="text-xs md:text-sm text-slate-500 mt-0.5">지역, 시설명, 바우처 및 반다비 센터 여부를 조건별로 편리하게 검색하세요.</p>
                 </div>
                 <div id="facilityCount" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
-                    데이터 준비 중...
+                    전국 데이터 로딩 중...
                 </div>
             </div>
 
@@ -114,7 +114,7 @@
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                        전국 공공데이터 전체 목록을 불러오는 중입니다...
+                        전국 모든 공공데이터를 불러오는 중입니다...
                     </div>
                 </div>
             </div>
@@ -178,20 +178,33 @@
             };
             map = new kakao.maps.Map(container, options);
             infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
-            fetchFacilitiesData();
+            fetchAllPagesData();
         }
 
-        async function fetchFacilitiesData() {
+        async function fetchAllPagesData() {
+            const apiKey = "83a0cdb0d15a0217c9299d37524dabf18f3c5f3cb8d4213ce9a6c299cbeda71b";
+            let rawList = [];
+            let page = 1;
+            let perPage = 100; // 한 번에 100개씩 요청
+
             try {
-                // 백엔드를 거치지 않고 공공데이터포털 API를 직접 호출 (perPage=500으로 전체 대량 조회)
-                const apiKey = "83a0cdb0d15a0217c9299d37524dabf18f3c5f3cb8d4213ce9a6c299cbeda71b";
-                const targetUrl = `https://api.odcloud.kr/api/15071029/v1/uddi:1882cd51-570a-40a2-9b57-657d47225c56?page=1&perPage=500&serviceKey=${apiKey}`;
-                
-                const response = await fetch(targetUrl);
-                const result = await response.json();
-                
-                const rawList = result.data || [];
-                if (Array.isArray(rawList) && rawList.length > 0) {
+                // 데이터가 더 이상 없을 때까지 페이지를 반복해서 모두 가져옴 (최대 10페이지 안전장치)
+                while (page <= 10) {
+                    const targetUrl = `https://api.odcloud.kr/api/15071029/v1/uddi:1882cd51-570a-40a2-9b57-657d47225c56?page=${page}&perPage=${perPage}&serviceKey=${apiKey}`;
+                    const response = await fetch(targetUrl);
+                    const result = await response.json();
+                    
+                    const pageData = result.data || [];
+                    if (pageData.length === 0) break;
+
+                    rawList = rawList.concat(pageData);
+                    
+                    // 가져온 개수가 perPage보다 적으면 마지막 페이지임
+                    if (pageData.length < perPage) break;
+                    page++;
+                }
+
+                if (rawList.length > 0) {
                     const ps = new kakao.maps.services.Places();
                     let processedCount = 0;
 
@@ -280,7 +293,7 @@
                 return matchRegion && matchSearch && matchVoucher && matchBandabi;
             });
 
-            document.getElementById('facilityCount').innerText = `검색 결과: ${filtered.length}개소`;
+            document.getElementById('facilityCount').innerText = `검색 결과: ${filtered.length}개소 (전체 ${allFacilities.length}개 연동)`;
             renderListAndMarkers(filtered);
         }
 
