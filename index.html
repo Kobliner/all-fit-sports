@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Kakao Maps SDK -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services&autoload=false"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; }
@@ -87,9 +87,11 @@
         let markers = [];
         let facilitiesData = [];
 
-        // 페이지가 열리자마자 곧바로 지도를 초기화하고 데이터를 불러옵니다.
+        // 페이지가 열릴 때 카카오맵 라이브러리를 안전하게 로드 후 초기화
         window.onload = function() {
-            initMap();
+            kakao.maps.load(function() {
+                initMap();
+            });
         };
 
         // 카카오맵 초기화
