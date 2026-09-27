@@ -114,7 +114,7 @@
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                        공공데이터와 지도 위치를 동기화 중입니다...
+                        전국 공공데이터 전체 목록을 불러오는 중입니다...
                     </div>
                 </div>
             </div>
@@ -129,7 +129,6 @@
                 <button onclick="closeModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
             </div>
             <div class="p-6 space-y-4">
-                <!-- 키워드 형태의 배지 영역 -->
                 <div class="flex flex-wrap gap-1.5" id="modalBadges"></div>
                 <div class="space-y-3 text-sm text-slate-600">
                     <div class="flex items-start gap-3">
@@ -184,7 +183,11 @@
 
         async function fetchFacilitiesData() {
             try {
-                const response = await fetch('/api/facilities');
+                // 백엔드를 거치지 않고 공공데이터포털 API를 직접 호출 (perPage=500으로 전체 대량 조회)
+                const apiKey = "83a0cdb0d15a0217c9299d37524dabf18f3c5f3cb8d4213ce9a6c299cbeda71b";
+                const targetUrl = `https://api.odcloud.kr/api/15071029/v1/uddi:1882cd51-570a-40a2-9b57-657d47225c56?page=1&perPage=500&serviceKey=${apiKey}`;
+                
+                const response = await fetch(targetUrl);
                 const result = await response.json();
                 
                 const rawList = result.data || [];
@@ -207,7 +210,7 @@
                                 lng = parseFloat(data[0].x);
                             }
 
-                            // 종목 키워드 자동 분류 강화 (데이터 분석)
+                            // 종목 키워드 자동 분류
                             const textSource = (name + " " + (item.운영기관 || "")).toLowerCase();
                             let sports = [];
                             
@@ -227,7 +230,6 @@
                                 sports.push("구기종목");
                             }
 
-                            // 만약 위 키워드에 매칭되지 않았다면 시설 기본 성격에 맞춰 기본 종목들 부여
                             if (sports.length === 0) {
                                 sports.push("다목적체육관");
                                 sports.push("헬스/피트니스");
@@ -300,7 +302,6 @@
                 const card = document.createElement('div');
                 card.className = "p-4 border border-slate-100 rounded-xl hover:bg-blue-50/60 hover:border-blue-200 transition cursor-pointer shadow-sm bg-white space-y-2";
                 
-                // 카드 내 키워드 배지 구성
                 let badges = `<span class="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-bold">${facility.region}</span>`;
                 if (facility.voucher === 'Y') {
                     badges += `<span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">스포츠 바우처</span>`;
@@ -365,7 +366,6 @@
                 hpContainer.style.display = 'none';
             }
 
-            // 모달 팝업 내 키워드 배지 구성 (지역 / 바우처 / 운영 종목 키워드 순서)
             let badgeHtml = `<span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-bold">${facility.region}</span>`;
             if (facility.voucher === 'Y') {
                 badgeHtml += `<span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg font-bold">스포츠 바우처 지정</span>`;
