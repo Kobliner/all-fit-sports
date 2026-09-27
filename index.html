@@ -6,7 +6,7 @@
     <title>All-Fit Sports - 장애인 체육시설 통합 플랫폼</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Kakao Maps SDK (your app key) -->
+    <!-- Kakao Maps SDK -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -16,72 +16,68 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
     <!-- 상단 네비게이션 -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer">
                 <span class="text-2xl font-black text-blue-600">All-Fit</span>
-                <span class="text-sm font-semibold text-slate-500">배리어프리 체육</span>
+                <span class="text-sm font-semibold text-slate-500">배리어프리 체육시설 통합 플랫폼</span>
             </div>
-            <nav class="flex space-x-6 text-sm font-medium">
-                <button onclick="showPage('home')" class="hover:text-blue-600 transition">홈</button>
-                <button onclick="showPage('facilities')" class="hover:text-blue-600 transition">체육시설 찾기</button>
-            </nav>
+            <div class="text-xs text-slate-500 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full font-medium">
+                🟢 공공데이터 실시간 연동중
+            </div>
         </div>
     </header>
 
-    <!-- 메인 콘텐츠 영역 -->
-    <main class="flex-1 max-w-6xl w-full mx-auto p-4">
+    <!-- 메인 대시보드 콘텐츠 (기본 화면으로 즉시 노출) -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
 
-        <!-- 1. 홈 페이지 -->
-        <section id="page-home" class="py-12 text-center">
-            <h1 class="text-4xl font-extrabold tracking-tight mb-4 text-slate-900">
-                모두를 위한 체육시설 안내 플랫폼
-            </h1>
-            <p class="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
-                대한장애인체육회 공공데이터와 연동하여 전국 장애인 전용 체육시설의 위치와 정보를 한눈에 확인하세요.
-            </p>
-            <button onclick="showPage('facilities')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition">
-                실시간 체육시설 찾기 시작하기
-            </button>
-        </section>
+        <!-- 상단 타이틀 및 필터 영역 -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900">전국 장애인 체육시설 찾기</h1>
+                <p class="text-sm text-slate-500 mt-1">대한장애인체육회 공공데이터와 카카오맵을 연동하여 전국의 배리어프리 체육시설을 안내합니다.</p>
+            </div>
+            <!-- 지역 필터 -->
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <select id="regionFilter" onchange="filterFacilities()" class="border border-slate-300 rounded-xl px-4 py-2.5 text-sm bg-white font-medium focus:outline-none focus:border-blue-500 w-full md:w-48">
+                    <option value="">전체 지역 보기</option>
+                    <option value="서울">서울특별시</option>
+                    <option value="경기">경기도</option>
+                    <option value="부산">부산광역시</option>
+                    <option value="인천">인천광역시</option>
+                    <option value="대구">대구광역시</option>
+                    <option value="대전">대전광역시</option>
+                    <option value="광주">광주광역시</option>
+                </select>
+            </div>
+        </div>
 
-        <!-- 2. 체육시설 찾기 페이지 -->
-        <section id="page-facilities" class="hidden space-y-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900">전국 장애인 체육시설 찾기</h2>
-                    <p class="text-sm text-slate-500">공공데이터포털 실시간 연동 데이터입니다.</p>
+        <!-- 지도와 리스트 레이아웃 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 지도 영역 (2칸) -->
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[600px] relative">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+            
+            <!-- 시설 리스트 영역 (1칸) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-[600px] flex flex-col">
+                <div class="mb-3 pb-2 border-b border-slate-100 flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-700">검색된 시설 목록</span>
+                    <span id="facilityCount" class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded">불러오는 중...</span>
                 </div>
-                <!-- 지역 필터 -->
-                <div class="flex gap-2">
-                    <select id="regionFilter" onchange="filterFacilities()" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
-                        <option value="">전체 지역</option>
-                        <option value="서울">서울</option>
-                        <option value="경기">경기</option>
-                        <option value="부산">부산</option>
-                        <option value="인천">인천</option>
-                        <option value="대구">대구</option>
-                    </select>
+                <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="facilityList">
+                    <div class="text-center text-slate-400 py-32">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                        공공데이터와 지도를 불러오는 중입니다...
+                    </div>
                 </div>
             </div>
-
-            <!-- 지도와 리스트 레이아웃 -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- 지도 영역 -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[450px]">
-                    <div id="map" class="w-full h-full"></div>
-                </div>
-                <!-- 시설 리스트 영역 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-[450px] overflow-y-auto space-y-3" id="facilityList">
-                    <div class="text-center text-slate-400 py-16">공공데이터를 불러오는 중입니다...</div>
-                </div>
-            </div>
-        </section>
+        </div>
 
     </main>
 
     <!-- 푸터 -->
-    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-8">
         &copy; 2026 All-Fit Sports. All rights reserved.
     </footer>
 
@@ -91,24 +87,10 @@
         let markers = [];
         let facilitiesData = [];
 
-        // 페이지 전환 함수
-        function showPage(pageId) {
-            document.getElementById('page-home').classList.add('hidden');
-            document.getElementById('page-facilities').classList.add('hidden');
-            
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
-
-            if (pageId === 'facilities') {
-                // 지도가 숨겨져 있다가 보일 때 크기 깨짐 방지 및 지도 초기화
-                setTimeout(() => {
-                    if (!map) {
-                        initMap();
-                    } else {
-                        map.relayout();
-                    }
-                }, 100);
-            }
-        }
+        // 페이지가 열리자마자 곧바로 지도를 초기화하고 데이터를 불러옵니다.
+        window.onload = function() {
+            initMap();
+        };
 
         // 카카오맵 초기화
         function initMap() {
@@ -131,9 +113,9 @@
                 
                 if (result && result.data) {
                     const geocoder = new kakao.maps.services.Geocoder();
-                    
-                    // 최대 30개 항목만 우선순위로 지오코딩 및 마커 생성 (부하 방지)
-                    const targetData = result.data.slice(0, 30);
+                    const targetData = result.data.slice(0, 40); // 원활한 로딩을 위해 상위 데이터 우선 처리
+
+                    let processedCount = 0;
 
                     targetData.forEach((item, index) => {
                         const address = item.소재지;
@@ -158,6 +140,7 @@
                                     bandabi: item.반다비시설 || "N"
                                 });
 
+                                processedCount++;
                                 renderFacilities();
                             }
                         });
@@ -182,6 +165,8 @@
                 ? facilitiesData.filter(f => f.region.includes(filterRegion))
                 : facilitiesData;
 
+            document.getElementById('facilityCount').innerText = `${filteredData.length}개소`;
+
             if (filteredData.length === 0) {
                 listContainer.innerHTML = '<div class="text-center text-slate-400 py-16">조건에 맞는 시설이 없습니다.</div>';
                 return;
@@ -190,22 +175,22 @@
             const bounds = new kakao.maps.LatLngBounds();
 
             filteredData.forEach(facility => {
-                // 1. 리스트 HTML 생성
+                // 1. 리스트 카드 생성
                 const card = document.createElement('div');
-                card.className = "p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition cursor-pointer shadow-sm";
+                card.className = "p-4 border border-slate-100 rounded-xl hover:bg-blue-50/50 hover:border-blue-200 transition cursor-pointer shadow-sm bg-white";
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-1">
                         <h3 class="font-bold text-slate-800 text-sm">${facility.name}</h3>
-                        <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-medium">${facility.region}</span>
+                        <span class="text-[11px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">${facility.region}</span>
                     </div>
                     <p class="text-xs text-slate-500 mb-2">${facility.address}</p>
-                    <div class="flex gap-2 text-[11px] text-slate-400">
+                    <div class="flex gap-3 text-[11px] text-slate-400 font-medium">
                         <span>📞 ${facility.phone}</span>
-                        <span>| 바우처: ${facility.voucher}</span>
+                        <span>바우처: ${facility.voucher}</span>
                     </div>
                 `;
                 
-                // 리스트 카드 클릭 시 해당 위치로 지도 이동
+                // 카드 클릭 시 지도 중심 이동
                 card.onclick = () => {
                     const moveLatLon = new kakao.maps.LatLng(facility.lat, facility.lng);
                     map.setCenter(moveLatLon);
@@ -224,13 +209,12 @@
                 bounds.extend(markerPosition);
             });
 
-            // 마커들이 한눈에 보이도록 지도 범위 재설정
             if (filteredData.length > 0) {
                 map.setBounds(bounds);
             }
         }
 
-        // 지역 필터 적용 함수
+        // 지역 필터 적용
         function filterFacilities() {
             const selectedRegion = document.getElementById('regionFilter').value;
             renderFacilities(selectedRegion);
