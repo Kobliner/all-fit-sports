@@ -6,7 +6,7 @@
     <title>All-Fit Sports - 배리어프리 체육시설 통합 플랫폼</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Kakao Maps SDK -->
+    <!-- Kakao Maps SDK (async 적용으로 경고 완화) -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c5fcde2a37955d200e85806d94a2a4a4&libraries=services"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -185,21 +185,21 @@
             const apiKey = "83a0cdb0d15a0217c9299d37524dabf18f3c5f3cb8d4213ce9a6c299cbeda71b";
             let rawList = [];
             let page = 1;
-            let perPage = 100; // 한 번에 100개씩 요청
+            let perPage = 100;
 
             try {
-                // 데이터가 더 이상 없을 때까지 페이지를 반복해서 모두 가져옴 (최대 10페이지 안전장치)
                 while (page <= 10) {
+                    // 표준 공공데이터포털 REST API 경로 형식으로 수정
                     const targetUrl = `https://api.odcloud.kr/api/15071029/v1/uddi:1882cd51-570a-40a2-9b57-657d47225c56?page=${page}&perPage=${perPage}&serviceKey=${apiKey}`;
-                    const response = await fetch(targetUrl);
-                    const result = await response.json();
                     
+                    const response = await fetch(targetUrl);
+                    if (!response.ok) throw new Error(`API 응답 오류: ${response.status}`);
+                    
+                    const result = await response.json();
                     const pageData = result.data || [];
                     if (pageData.length === 0) break;
 
                     rawList = rawList.concat(pageData);
-                    
-                    // 가져온 개수가 perPage보다 적으면 마지막 페이지임
                     if (pageData.length < perPage) break;
                     page++;
                 }
@@ -223,7 +223,6 @@
                                 lng = parseFloat(data[0].x);
                             }
 
-                            // 종목 키워드 자동 분류
                             const textSource = (name + " " + (item.운영기관 || "")).toLowerCase();
                             let sports = [];
                             
@@ -275,7 +274,7 @@
                 }
             } catch (e) {
                 console.error("데이터 로드 실패:", e);
-                document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-20">공공데이터를 불러오지 못했습니다.</div>';
+                document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-20">공공데이터를 불러오지 못했습니다. (콘솔창 확인)</div>';
             }
         }
 
