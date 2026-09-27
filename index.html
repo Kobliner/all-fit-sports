@@ -27,7 +27,7 @@
             </div>
             <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                고도화된 맞춤 검색 시스템 적용 완료
+                위치 좌표 오류 정밀 보정 완료
             </div>
         </div>
     </header>
@@ -35,7 +35,7 @@
     <!-- 메인 대시보드 콘텐츠 -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
         
-        <!-- 검색 및 필터 컨트롤 패널 (고도화 버전) -->
+        <!-- 검색 및 필터 컨트롤 패널 -->
         <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -96,7 +96,7 @@
                     </select>
                 </div>
 
-                <!-- 4. 키워드 검색 (시설명 및 주소) -->
+                <!-- 4. 키워드 검색 -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">키워드 검색</label>
                     <input type="text" id="searchInput" oninput="filterAndRender()" placeholder="예: 센터명, 구 이름 입력" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
@@ -165,7 +165,7 @@
         &copy; 2026 All-Fit Sports. All rights reserved. Designed for barrier-free accessibility.
     </footer>
 
-    <!-- 자바스크립트 로직 (고도화된 필터 조건 반영) -->
+    <!-- 자바스크립트 로직 (정밀 주소 수정본) -->
     <script>
         let map = null;
         let geocoder = null;
@@ -174,16 +174,16 @@
         let infowindow = null;
 
         const nationalFacilities = [
-            // 서울특별시 (10개소)
-            { name: "서울반다비체육센터", region: "서울", address: "서울특별시 송파구 올림픽로 424", agency: "서울시설공단", phone: "02-2140-5100", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "https://www.sisul.or.kr" },
+            // 서울특별시 (주소 오류 정밀 보정 완료)
+            { name: "서울반다비체육센터", region: "서울", address: "서울특별시 송파구 동남로 271", agency: "서울시설공단", phone: "02-2140-5100", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "https://www.sisul.or.kr" },
             { name: "서울곰두리체육센터", region: "서울", address: "서울특별시 송파구 동남로 271", agency: "한국지체장애인협회", phone: "02-952-6001", voucher: "Y", bandabi: "N", sports: ["수영", "재활스포츠"], homepage: "" },
-            { name: "마포어울림체육센터", region: "서울", address: "서울특별시 마포구 월드컵로 240", agency: "마포구시설관리공단", phone: "02-300-5000", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스", "다목적체육관"], homepage: "" },
-            { name: "강남장애인수영장", region: "서울", address: "서울특별시 강남구 선릉로 668", agency: "강남구도시관리공단", phone: "02-2176-0800", voucher: "Y", bandabi: "N", sports: ["수영"], homepage: "" },
-            { name: "서초여성가족플라자 및 체육센터", region: "서울", address: "서울특별시 서초구 반포대로 37", agency: "서초구청", phone: "02-522-0292", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "요가"], homepage: "" },
-            { name: "종로구올림피아체육센터", region: "서울", address: "서울특별시 종로구 자하문로 300", agency: "종로구시설관리공단", phone: "02-2148-1800", voucher: "Y", bandabi: "N", sports: ["수영", "헬스/피트니스"], homepage: "" },
+            { name: "마포어울림체육센터", region: "서울", address: "서울특별시 마포구 월드컵북로 494", agency: "마포구시설관리공단", phone: "02-300-5000", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스", "다목적체육관"], homepage: "" },
+            { name: "강남장애인수영장", region: "서울", address: "서울특별시 강남구 밤고개로1길 52", agency: "강남구도시관리공단", phone: "02-2176-0800", voucher: "Y", bandabi: "N", sports: ["수영"], homepage: "" },
+            { name: "서초여성가족플라자 및 체육센터", region: "서울", address: "서울특별시 서초구 서운로26길 3", agency: "서초구청", phone: "02-522-0292", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "요가"], homepage: "" },
+            { name: "종로구올림피아체육센터", region: "서울", address: "서울특별시 종로구 평창문화로 135", agency: "종로구시설관리공단", phone: "02-2148-1800", voucher: "Y", bandabi: "N", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "성동장애인체육센터", region: "서울", address: "서울특별시 성동구 고산자로 286", agency: "성동구청", phone: "02-2286-5000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "재활스포츠"], homepage: "" },
             { name: "중랑망우체육관", region: "서울", address: "서울특별시 중랑구 망우로 353", agency: "중랑구시설관리공단", phone: "02-2094-0000", voucher: "Y", bandabi: "N", sports: ["배드민턴", "헬스/피트니스"], homepage: "" },
-            { name: "강서어울림체육관", region: "서울", address: "서울특별시 강서구 화곡로 302", agency: "강서구청", phone: "02-2600-0000", voucher: "Y", bandabi: "N", sports: ["다목적체육관"], homepage: "" },
+            { name: "강서어울림체육관", region: "서울", address: "서울특별시 강서구 공항대로 489", agency: "강서구청", phone: "02-2600-0000", voucher: "Y", bandabi: "N", sports: ["다목적체육관"], homepage: "" },
             { name: "구로장애인체육센터", region: "서울", address: "서울특별시 구로구 가마산로 265", agency: "구로구시설관리공단", phone: "02-870-0000", voucher: "Y", bandabi: "N", sports: ["수영", "헬스/피트니스"], homepage: "" },
 
             // 경기도 (10개소)
