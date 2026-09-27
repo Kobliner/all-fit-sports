@@ -75,7 +75,7 @@
                 <!-- 시설명 검색 -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">시설명 검색</label>
-                    <input type="text" id="searchInput" oninput="filterAndRender()" placeholder="예: 체육센터, 수영장" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
+                    <input type="text" id="searchInput" oninput="filterAndRender()" placeholder="예: 체육센터, 서울" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
                 </div>
 
                 <!-- 바우처 시설 여부 -->
@@ -150,22 +150,22 @@
                 const response = await fetch('/api/facilities');
                 const result = await response.json();
                 
-                const rawList = result.data || result;
+                const rawList = result.data || [];
                 if (Array.isArray(rawList) && rawList.length > 0) {
-                    const geocoder = new kakao.maps.services.Geocoder();
-                    
-                    rawList.forEach((item, index) => {
-                        const address = item.소재지 || item.도로명주소 || item.지번주소;
-                        const name = item.시설명 || item.체육시설명;
-                        
-                        if (!address || !name) return;
+                    const ps = new kakao.maps.services.Places();
 
-                        // 비동기 주소 검색 지연을 줄이기 위해 순차적 처리 대신 안전한 콜백 사용
-                        geocoder.addressSearch(address, function(status, data) {
+                    rawList.forEach((item, index) => {
+                        const name = item.시설명;
+                        const region = item.시_도 || "기타";
+                        const subRegion = item.소재지 || ""; // 예: 관악구
+                        const keyword = `${region} ${subRegion} ${name}`;
+
+                        // 카카오 장소 키워드 검색으로 정확한 위치 탐색
+                        ps.keywordSearch(keyword, function(data, status) {
                             let lat = 37.566826;
                             let lng = 126.978656;
 
-                            if (status === kakao.maps.services.Status.OK) {
+                            if (status === kakao.maps.services.Status.OK && data.length > 0) {
                                 lat = parseFloat(data[0].y);
                                 lng = parseFloat(data[0].x);
                             }
@@ -173,16 +173,16 @@
                             allFacilities.push({
                                 id: index + 1,
                                 name: name,
-                                region: item.시_도 || item.시도 || "기타",
-                                address: address,
+                                region: region,
+                                address: `${region} ${subRegion} (${item.운영기관 || '운영기관 정보 없음'})`,
                                 lat: lat,
                                 lng: lng,
-                                phone: item.전화번호 || item.연락처 || "문의 전화 없음",
-                                voucher: (item.장애인스포츠강좌바우처시설 === "Y" || item.바우처여부 === "Y") ? "Y" : "N",
-                                bandabi: (item.반다비시설 === "Y" || item.반다비여부 === "Y") ? "Y" : "N"
+                                phone: item.전화번호 || "문의 전화 없음",
+                                voucher: item["장애인스포츠강좌 바우처시설"] === "Y" ? "Y" : "N",
+                                bandabi: item.반다비시설 === "Y" ? "Y" : "N",
+                                homepage: item.홈페이지 || ""
                             });
 
-                            // 데이터가 하나씩 쌓일 때마다 실시간 필터 및 렌더링 반영
                             filterAndRender();
                         });
                     });
