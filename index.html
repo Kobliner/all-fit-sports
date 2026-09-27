@@ -6,6 +6,8 @@
     <title>All-Fit Sports - 장애인 체육시설 통합 플랫폼</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Kakao Maps SDK (정적 표준 로드 방식) -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c5fcde2a37955d200e85806d94a2a4a4&libraries=services"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; }
@@ -60,7 +62,7 @@
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                        카카오맵 및 공공데이터 로딩 중...
+                        공공데이터와 지도를 불러오는 중입니다...
                     </div>
                 </div>
             </div>
@@ -71,26 +73,26 @@
         &copy; 2026 All-Fit Sports. All rights reserved.
     </footer>
 
-    <!-- 동적 스크립트 로딩 및 로직 -->
+    <!-- 자바스크립트 로직 -->
     <script>
         let map = null;
         let markers = [];
         let facilitiesData = [];
 
-        // 페이지가 열릴 때 카카오맵 스크립트를 동적으로 안전하게 삽입
+        // 페이지 로드 시 카카오맵 객체 검증 후 즉시 초기화
         window.onload = function() {
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = "//dapi.kakao.com/v2/maps/sdk.js?appkey=c5fcde2a37955d200e85806d94a2a4a4&libraries=services&autoload=false";
-            script.onload = function() {
-                kakao.maps.load(function() {
-                    initMap();
-                });
-            };
-            script.onerror = function() {
-                document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-16">카카오맵 스크립트 로드 실패<br>(도메인 등록을 확인해주세요)</div>';
-            };
-            document.head.appendChild(script);
+            if (typeof kakao !== 'undefined' && kakao.maps) {
+                initMap();
+            } else {
+                // 스크립트 로딩 대기
+                setTimeout(() => {
+                    if (typeof kakao !== 'undefined' && kakao.maps) {
+                        initMap();
+                    } else {
+                        document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-16">카카오맵 로드 실패<br>카카오 디벨로퍼스 도메인 설정을 다시 확인해주세요.</div>';
+                    }
+                }, 1000);
+            }
         };
 
         function initMap() {
