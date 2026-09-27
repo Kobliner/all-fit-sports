@@ -6,8 +6,7 @@
     <title>All-Fit Sports - 장애인 체육시설 통합 플랫폼</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Kakao Maps SDK -->
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services&autoload=false"></script>    <style>
+    <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; }
     </style>
@@ -27,16 +26,13 @@
         </div>
     </header>
 
-    <!-- 메인 대시보드 콘텐츠 (기본 화면으로 즉시 노출) -->
+    <!-- 메인 대시보드 콘텐츠 -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
-
-        <!-- 상단 타이틀 및 필터 영역 -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div>
                 <h1 class="text-2xl font-extrabold text-slate-900">전국 장애인 체육시설 찾기</h1>
                 <p class="text-sm text-slate-500 mt-1">대한장애인체육회 공공데이터와 카카오맵을 연동하여 전국의 배리어프리 체육시설을 안내합니다.</p>
             </div>
-            <!-- 지역 필터 -->
             <div class="flex items-center gap-2 w-full md:w-auto">
                 <select id="regionFilter" onchange="filterFacilities()" class="border border-slate-300 rounded-xl px-4 py-2.5 text-sm bg-white font-medium focus:outline-none focus:border-blue-500 w-full md:w-48">
                     <option value="">전체 지역 보기</option>
@@ -51,14 +47,11 @@
             </div>
         </div>
 
-        <!-- 지도와 리스트 레이아웃 -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- 지도 영역 (2칸) -->
             <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[600px] relative">
                 <div id="map" class="w-full h-full"></div>
             </div>
             
-            <!-- 시설 리스트 영역 (1칸) -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-[600px] flex flex-col">
                 <div class="mb-3 pb-2 border-b border-slate-100 flex justify-between items-center">
                     <span class="text-sm font-bold text-slate-700">검색된 시설 목록</span>
@@ -67,55 +60,49 @@
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                        공공데이터와 지도를 불러오는 중입니다...
+                        카카오맵 및 공공데이터 로딩 중...
                     </div>
                 </div>
             </div>
         </div>
-
     </main>
 
-    <!-- 푸터 -->
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-8">
         &copy; 2026 All-Fit Sports. All rights reserved.
     </footer>
 
-    <!-- 자바스크립트 로직 -->
+    <!-- 동적 스크립트 로딩 및 로직 -->
     <script>
         let map = null;
         let markers = [];
         let facilitiesData = [];
 
-        // 페이지가 열릴 때 카카오맵 라이브러리를 안전하게 로드 후 초기화
+        // 페이지가 열릴 때 카카오맵 스크립트를 동적으로 안전하게 삽입
         window.onload = function() {
-            if (typeof kakao !== 'undefined' && kakao.maps) {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = "//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services&autoload=false";
+            script.onload = function() {
                 kakao.maps.load(function() {
                     initMap();
                 });
-            } else {
-                // 스크립트 로드가 약간 지연될 경우 대비
-                setTimeout(() => {
-                    kakao.maps.load(function() {
-                        initMap();
-                    });
-                }, 500);
-            }
+            };
+            script.onerror = function() {
+                document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-16">카카오맵 스크립트 로드 실패<br>(도메인 등록을 확인해주세요)</div>';
+            };
+            document.head.appendChild(script);
         };
 
-        // 카카오맵 초기화
         function initMap() {
             const container = document.getElementById('map');
             const options = {
-                center: new kakao.maps.LatLng(37.566826, 126.978656), // 서울 중심 좌표
+                center: new kakao.maps.LatLng(37.566826, 126.978656),
                 level: 7
             };
             map = new kakao.maps.Map(container, options);
-
-            // 지도 생성 후 공공데이터 호출 시작
             fetchFacilitiesData();
         }
 
-        // 서버less API를 통해 공공데이터 가져오기 및 지오코딩 처리
         async function fetchFacilitiesData() {
             try {
                 const response = await fetch('/api/facilities');
@@ -123,9 +110,7 @@
                 
                 if (result && result.data) {
                     const geocoder = new kakao.maps.services.Geocoder();
-                    const targetData = result.data.slice(0, 40); // 원활한 로딩을 위해 상위 데이터 우선 처리
-
-                    let processedCount = 0;
+                    const targetData = result.data.slice(0, 40);
 
                     targetData.forEach((item, index) => {
                         const address = item.소재지;
@@ -150,7 +135,6 @@
                                     bandabi: item.반다비시설 || "N"
                                 });
 
-                                processedCount++;
                                 renderFacilities();
                             }
                         });
@@ -162,12 +146,10 @@
             }
         }
 
-        // 시설 목록 및 지도 마커 렌더링
         function renderFacilities(filterRegion = "") {
             const listContainer = document.getElementById('facilityList');
             listContainer.innerHTML = '';
 
-            // 기존 마커 초기화
             markers.forEach(marker => marker.setMap(null));
             markers = [];
 
@@ -185,7 +167,6 @@
             const bounds = new kakao.maps.LatLngBounds();
 
             filteredData.forEach(facility => {
-                // 1. 리스트 카드 생성
                 const card = document.createElement('div');
                 card.className = "p-4 border border-slate-100 rounded-xl hover:bg-blue-50/50 hover:border-blue-200 transition cursor-pointer shadow-sm bg-white";
                 card.innerHTML = `
@@ -200,7 +181,6 @@
                     </div>
                 `;
                 
-                // 카드 클릭 시 지도 중심 이동
                 card.onclick = () => {
                     const moveLatLon = new kakao.maps.LatLng(facility.lat, facility.lng);
                     map.setCenter(moveLatLon);
@@ -208,11 +188,8 @@
                 };
                 listContainer.appendChild(card);
 
-                // 2. 카카오맵 마커 생성
                 const markerPosition = new kakao.maps.LatLng(facility.lat, facility.lng);
-                const marker = new kakao.maps.Marker({
-                    position: markerPosition
-                });
+                const marker = new kakao.maps.Marker({ position: markerPosition });
                 marker.setMap(map);
                 markers.push(marker);
 
@@ -224,7 +201,6 @@
             }
         }
 
-        // 지역 필터 적용
         function filterFacilities() {
             const selectedRegion = document.getElementById('regionFilter').value;
             renderFacilities(selectedRegion);
