@@ -7,8 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Kakao Maps SDK -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services&autoload=false"></script>
-    <style>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services&autoload=false"></script>    <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; }
     </style>
@@ -89,9 +88,18 @@
 
         // 페이지가 열릴 때 카카오맵 라이브러리를 안전하게 로드 후 초기화
         window.onload = function() {
-            kakao.maps.load(function() {
-                initMap();
-            });
+            if (typeof kakao !== 'undefined' && kakao.maps) {
+                kakao.maps.load(function() {
+                    initMap();
+                });
+            } else {
+                // 스크립트 로드가 약간 지연될 경우 대비
+                setTimeout(() => {
+                    kakao.maps.load(function() {
+                        initMap();
+                    });
+                }, 500);
+            }
         };
 
         // 카카오맵 초기화
