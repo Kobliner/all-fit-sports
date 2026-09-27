@@ -109,7 +109,7 @@
             <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-[550px] lg:h-[650px] flex flex-col">
                 <div class="mb-3 pb-2 border-b border-slate-100 flex justify-between items-center">
                     <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">검색된 시설 리스트</span>
-                    <span class="text-[11px] text-slate-400">카드를 누르면 지도 위치로 이동합니다</span>
+                    <span class="text-[11px] text-slate-400">카드를 누르면 상세정보 및 위치 이동</span>
                 </div>
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
@@ -121,6 +121,40 @@
         </div>
     </main>
 
+    <!-- 상세 정보 모달 팝업 -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 transform transition-all">
+            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center text-white">
+                <h3 id="modalTitle" class="font-extrabold text-lg">시설 상세 정보</h3>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex items-center gap-2" id="modalBadges"></div>
+                <div class="space-y-3 text-sm text-slate-600">
+                    <div class="flex items-start gap-3">
+                        <span class="font-semibold text-slate-700 w-20 shrink-0">소재 지역:</span>
+                        <span id="modalRegion"></span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="font-semibold text-slate-700 w-20 shrink-0">운영 기관:</span>
+                        <span id="modalAgency"></span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="font-semibold text-slate-700 w-20 shrink-0">문의 전화:</span>
+                        <span id="modalPhone" class="text-blue-600 font-medium"></span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="font-semibold text-slate-700 w-20 shrink-0">공식 홈페이지:</span>
+                        <a id="modalHomepage" href="#" target="_blank" class="text-blue-600 underline truncate block max-w-[300px]"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">닫기</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-8">
         &copy; 2026 All-Fit Sports. All rights reserved. Designed for barrier-free accessibility.
     </footer>
@@ -130,6 +164,7 @@
         let map = null;
         let markers = [];
         let allFacilities = [];
+        let infowindow = null;
 
         window.onload = function() {
             initMap();
@@ -142,6 +177,7 @@
                 level: 7
             };
             map = new kakao.maps.Map(container, options);
+            infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
             fetchFacilitiesData();
         }
 
@@ -174,17 +210,18 @@
                                 id: index + 1,
                                 name: name,
                                 region: region,
-                                address: `${region} ${subRegion} (${item.운영기관 || '운영기관 정보 없음'})`,
+                                subRegion: subRegion,
+                                agency: item.운영기관 || '운영기관 정보 없음',
+                                address: `${region} ${subRegion}`,
                                 lat: lat,
                                 lng: lng,
                                 phone: item.전화번호 || "문의 전화 없음",
                                 voucher: item["장애인스포츠강좌 바우처시설"] === "Y" ? "Y" : "N",
                                 bandabi: item.반다비시설 === "Y" ? "Y" : "N",
-                                homepage: item.홈페이지 || ""
+                                homepage: item.홈페이지 ? (item.홈페이지.startsWith('http') ? item.홈페이지 : 'https://' + item.홈페이지) : ""
                             });
 
                             processedCount++;
-                            // 모든 데이터의 지오코딩이 완료된 시점에 최초 렌더링 수행
                             if (processedCount === rawList.length) {
                                 filterAndRender();
                             }
@@ -205,7 +242,7 @@
             const voucherVal = document.getElementById('voucherFilter').value;
             const bandabiVal = document.getElementById('bandabiFilter').value;
 
-            const filtered = allFacilities.fiter ? [] : allFacilities.filter(f => {
+            const filtered = allFacilities.filter(f => {
                 const matchRegion = regionVal ? f.region.includes(regionVal) : true;
                 const matchSearch = searchVal ? f.name.toLowerCase().includes(searchVal) || f.address.toLowerCase().includes(searchVal) : true;
                 const matchVoucher = voucherVal ? f.voucher === voucherVal : true;
@@ -221,7 +258,6 @@
             const listContainer = document.getElementById('facilityList');
             listContainer.innerHTML = '';
 
-            // 기존 지도 마커 초기화
             markers.forEach(marker => marker.setMap(null));
             markers = [];
 
@@ -249,33 +285,72 @@
                         <h3 class="font-bold text-slate-800 text-sm leading-snug">${facility.name}</h3>
                         <div class="flex flex-wrap gap-1 justify-end">${badges}</div>
                     </div>
-                    <p class="text-xs text-slate-500">${facility.address}</p>
+                    <p class="text-xs text-slate-500">${facility.address} (${facility.agency})</p>
                     <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-50">
                         <span>📞 ${facility.phone}</span>
-                        <span class="text-blue-600 font-medium">지도 보기 &rarr;</span>
+                        <span class="text-blue-600 font-medium">상세보기 &rarr;</span>
                     </div>
                 `;
                 
+                // 카드 클릭 시 지도 이동 및 모달 팝업 열기
                 card.onclick = () => {
                     const moveLatLon = new kakao.maps.LatLng(facility.lat, facility.lng);
                     map.setCenter(moveLatLon);
                     map.setLevel(3);
+                    openModal(facility);
                 };
                 listContainer.appendChild(card);
 
-                // 지도 마커 생성 및 등록
+                // 지도 마커 생성
                 const markerPosition = new kakao.maps.LatLng(facility.lat, facility.lng);
                 const marker = new kakao.maps.Marker({ position: markerPosition });
                 marker.setMap(map);
-                markers.push(marker);
 
+                // 마커 클릭 시 인포윈도우 및 모달 연결
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    infowindow.setContent(`<div style="padding:8px 12px;font-size:12px;font-weight:bold;color:#1e293b;">${facility.name}</div>`);
+                    infowindow.open(map, marker);
+                    openModal(facility);
+                });
+
+                markers.push(marker);
                 bounds.extend(markerPosition);
             });
 
-            // 검색된 결과 범위로 지도 영역 재설정
             if (list.length > 0) {
                 map.setBounds(bounds);
             }
+        }
+
+        function openModal(facility) {
+            document.getElementById('modalTitle').innerText = facility.name;
+            document.getElementById('modalRegion').innerText = `${facility.region} ${facility.subRegion}`;
+            document.getElementById('modalAgency').innerText = facility.agency;
+            document.getElementById('modalPhone').innerText = facility.phone;
+            
+            const hpEl = document.getElementById('modalHomepage');
+            if (facility.homepage) {
+                hpEl.href = facility.homepage;
+                hpEl.innerText = facility.homepage;
+                hpEl.parentElement.style.display = 'flex';
+            } else {
+                hpEl.parentElement.style.display = 'none';
+            }
+
+            let badgeHtml = `<span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-bold">${facility.region}</span>`;
+            if (facility.voucher === 'Y') {
+                badgeHtml += `<span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg font-bold">스포츠강좌 바우처 지정</span>`;
+            }
+            if (facility.bandabi === 'Y') {
+                badgeHtml += `<span class="text-xs bg-purple-100 text-purple-800 px-2.5 py-1 rounded-lg font-bold">반다비 체육센터</span>`;
+            }
+            document.getElementById('modalBadges').innerHTML = badgeHtml;
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
         }
     </script>
 </body>
