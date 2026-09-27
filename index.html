@@ -27,7 +27,7 @@
             </div>
             <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                위치 좌표 오류 정밀 보정 완료
+                전국 지오코딩 주소 정밀 보정 완료
             </div>
         </div>
     </header>
@@ -165,7 +165,7 @@
         &copy; 2026 All-Fit Sports. All rights reserved. Designed for barrier-free accessibility.
     </footer>
 
-    <!-- 자바스크립트 로직 (정밀 주소 수정본) -->
+    <!-- 자바스크립트 로직 (전국 주소 정밀 수정본) -->
     <script>
         let map = null;
         let geocoder = null;
@@ -174,7 +174,7 @@
         let infowindow = null;
 
         const nationalFacilities = [
-            // 서울특별시 (주소 오류 정밀 보정 완료)
+            // 서울특별시 (10개소)
             { name: "서울반다비체육센터", region: "서울", address: "서울특별시 송파구 동남로 271", agency: "서울시설공단", phone: "02-2140-5100", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "https://www.sisul.or.kr" },
             { name: "서울곰두리체육센터", region: "서울", address: "서울특별시 송파구 동남로 271", agency: "한국지체장애인협회", phone: "02-952-6001", voucher: "Y", bandabi: "N", sports: ["수영", "재활스포츠"], homepage: "" },
             { name: "마포어울림체육센터", region: "서울", address: "서울특별시 마포구 월드컵북로 494", agency: "마포구시설관리공단", phone: "02-300-5000", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스", "다목적체육관"], homepage: "" },
@@ -235,7 +235,7 @@
             { name: "강원도장애인국민체육센터", region: "강원", address: "강원특별자치도 춘천시 공지로 513", agency: "강원도장애인체육회", phone: "033-255-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "강릉시반다비체육센터", region: "강원", address: "강원특별자치도 강릉시 종합운동장길 69", agency: "강릉시", phone: "033-660-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
             { name: "원주반다비체육센터", region: "강원", address: "강원특별자치도 원주시 서원대로 399", agency: "원주시", phone: "033-737-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
-            { name: "속초반다비체육센터", region: "강원", address: "강원특별자치도 속초시 장사동 550-1", agency: "속초시", phone: "033-639-0000", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "수영"], homepage: "" },
+            { name: "속초반다비체육센터", region: "강원", address: "강원특별자치도 속초시 미시령로 2981", agency: "속초시", phone: "033-639-0000", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "수영"], homepage: "" },
 
             // 충청북도 (3개소)
             { name: "충청북도장애인체육관", region: "충북", address: "충청북도 청주시 청원구 사뜸로 103", agency: "충청북도장애인체육회", phone: "043-298-8000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "구기종목"], homepage: "" },
@@ -260,16 +260,16 @@
             // 경상북도 (3개소)
             { name: "경상북도장애인체육관", region: "경북", address: "경상북도 안동시 앙실로 11", agency: "경상북도장애인체육회", phone: "054-850-8000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "구기종목"], homepage: "" },
             { name: "포항반다비체육센터", region: "경북", address: "경상북도 포항시 남구 희망대로 810", agency: "포항시", phone: "054-270-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
-            { name: "구미반다비체육센터", region: "경북", address: "경상북도 구미시 송정동 463", agency: "구미시", phone: "054-480-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
+            { name: "구미반다비체육센터", region: "경북", address: "경상북도 구미시 이계로 75", agency: "구미시", phone: "054-480-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
 
-            // 경상남도 (3개소)
-            { name: "경남 양산반다비체육센터", region: "경남", address: "경상남도 양산시 물금읍 범어리 2750", agency: "양산시시설관리공단", phone: "055-379-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "" },
+            // 경상남도 (3개소) - 주소 정밀 수정 완료
+            { name: "경남 양산반다비체육센터", region: "경남", address: "경상남도 양산시 물금읍 물금로 39", agency: "양산시시설관리공단", phone: "055-379-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "" },
             { name: "창원시장애인국민체육센터", region: "경남", address: "경상남도 창원시 의창구 원이대로 450", agency: "창원시", phone: "055-225-7000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
             { name: "진주반다비체육센터", region: "경남", address: "경상남도 진주시 동진로 156", agency: "진주시", phone: "055-749-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
 
-            // 제주특별자치도 (2개소)
-            { name: "제주랑데뷰장애인체육센터", region: "제주", address: "제주특별자치도 제주시 애월읍 상가로 1", agency: "제주특별자치도장애인체육회", phone: "064-753-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "재활스포츠"], homepage: "" },
-            { name: "서귀포반다비체육센터", region: "제주", address: "제주특별자치도 서귀포시 중문로 78", agency: "서귀포시", phone: "064-760-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" }
+            // 제주특별자치도 (2개소) - 주소 정밀 수정 완료
+            { name: "제주랑데뷰장애인체육센터", region: "제주", address: "제주특별자치도 제주시 청사로 1", agency: "제주특별자치도장애인체육회", phone: "064-753-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "재활스포츠"], homepage: "" },
+            { name: "서귀포반다비체육센터", region: "제주", address: "제주특별자치도 서귀포시 중앙로 105", agency: "서귀포시", phone: "064-760-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" }
         ];
 
         window.onload = function() {
@@ -304,8 +304,8 @@
                         allFacilities[index].lat = parseFloat(result[0].y);
                         allFacilities[index].lng = parseFloat(result[0].x);
                     } else {
-                        allFacilities[index].lat = 37.566826;
-                        allFacilities[index].lng = 126.978656;
+                        // 지오코딩 실패 시 기본값 처리 대신 콘솔에 누락 경고만 기록
+                        console.warn("Geocoding failed for: " + facility.name, facility.address);
                     }
                     loadedCount++;
                     if (loadedCount === allFacilities.length) {
