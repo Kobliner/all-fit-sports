@@ -43,7 +43,7 @@
                     <p class="text-xs md:text-sm text-slate-500 mt-0.5">지역, 시설명, 바우처 및 반다비 센터 여부를 조건별로 편리하게 검색하세요.</p>
                 </div>
                 <div id="facilityCount" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
-                    데이터 불러오는 중...
+                    데이터 준비 중...
                 </div>
             </div>
 
@@ -114,7 +114,7 @@
                 <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar" id="facilityList">
                     <div class="text-center text-slate-400 py-32">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                        공공데이터와 시설 정보를 불러오는 중입니다...
+                        공공데이터와 지도 위치를 동기화 중입니다...
                     </div>
                 </div>
             </div>
@@ -153,14 +153,14 @@
                 const rawList = result.data || [];
                 if (Array.isArray(rawList) && rawList.length > 0) {
                     const ps = new kakao.maps.services.Places();
+                    let processedCount = 0;
 
                     rawList.forEach((item, index) => {
                         const name = item.시설명;
                         const region = item.시_도 || "기타";
-                        const subRegion = item.소재지 || ""; // 예: 관악구
+                        const subRegion = item.소재지 || ""; 
                         const keyword = `${region} ${subRegion} ${name}`;
 
-                        // 카카오 장소 키워드 검색으로 정확한 위치 탐색
                         ps.keywordSearch(keyword, function(data, status) {
                             let lat = 37.566826;
                             let lng = 126.978656;
@@ -183,7 +183,11 @@
                                 homepage: item.홈페이지 || ""
                             });
 
-                            filterAndRender();
+                            processedCount++;
+                            // 모든 데이터의 지오코딩이 완료된 시점에 최초 렌더링 수행
+                            if (processedCount === rawList.length) {
+                                filterAndRender();
+                            }
                         });
                     });
                 } else {
@@ -201,7 +205,7 @@
             const voucherVal = document.getElementById('voucherFilter').value;
             const bandabiVal = document.getElementById('bandabiFilter').value;
 
-            const filtered = allFacilities.filter(f => {
+            const filtered = allFacilities.fiter ? [] : allFacilities.filter(f => {
                 const matchRegion = regionVal ? f.region.includes(regionVal) : true;
                 const matchSearch = searchVal ? f.name.toLowerCase().includes(searchVal) || f.address.toLowerCase().includes(searchVal) : true;
                 const matchVoucher = voucherVal ? f.voucher === voucherVal : true;
@@ -217,6 +221,7 @@
             const listContainer = document.getElementById('facilityList');
             listContainer.innerHTML = '';
 
+            // 기존 지도 마커 초기화
             markers.forEach(marker => marker.setMap(null));
             markers = [];
 
@@ -258,6 +263,7 @@
                 };
                 listContainer.appendChild(card);
 
+                // 지도 마커 생성 및 등록
                 const markerPosition = new kakao.maps.LatLng(facility.lat, facility.lng);
                 const marker = new kakao.maps.Marker({ position: markerPosition });
                 marker.setMap(map);
@@ -266,6 +272,7 @@
                 bounds.extend(markerPosition);
             });
 
+            // 검색된 결과 범위로 지도 영역 재설정
             if (list.length > 0) {
                 map.setBounds(bounds);
             }
