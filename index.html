@@ -27,7 +27,7 @@
             </div>
             <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                실제 정확한 도로명 주소 데이터베이스 반영 완료
+                고도화된 맞춤 검색 시스템 적용 완료
             </div>
         </div>
     </header>
@@ -35,12 +35,12 @@
     <!-- 메인 대시보드 콘텐츠 -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
         
-        <!-- 검색 및 필터 컨트롤 패널 -->
+        <!-- 검색 및 필터 컨트롤 패널 (고도화 버전) -->
         <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">전국 장애인 체육시설 맞춤 검색</h1>
-                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">지역, 시설명, 바우처 및 반다비 센터 여부를 조건별로 편리하게 검색하세요.</p>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">지역, 스포츠강좌 바우처, 종목 및 키워드로 원하는 체육시설을 명확하게 찾아보세요.</p>
                 </div>
                 <div id="facilityCount" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
                     전국 실주소 기반 위치 정밀 연동 중...
@@ -48,9 +48,9 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
-                <!-- 지역 선택 -->
+                <!-- 1. 지역 선택 -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">지역별 필터</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">지역별 선택</label>
                     <select id="regionFilter" onchange="filterAndRender()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
                         <option value="">전체 지역 (시/도)</option>
                         <option value="서울">서울특별시</option>
@@ -72,13 +72,7 @@
                     </select>
                 </div>
 
-                <!-- 시설명 검색 -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">시설명 검색</label>
-                    <input type="text" id="searchInput" oninput="filterAndRender()" placeholder="예: 체육센터, 수영, 국민체육" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
-                </div>
-
-                <!-- 바우처 시설 여부 -->
+                <!-- 2. 스포츠강좌 바우처 여부 -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">스포츠강좌 바우처</label>
                     <select id="voucherFilter" onchange="filterAndRender()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
@@ -87,13 +81,25 @@
                     </select>
                 </div>
 
-                <!-- 반다비 체육센터 여부 -->
+                <!-- 3. 종목별 필터 -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">반다비 체육센터</label>
-                    <select id="bandabiFilter" onchange="filterAndRender()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
-                        <option value="">전체보기</option>
-                        <option value="Y">반다비 센터만</option>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">종목 선택</label>
+                    <select id="sportFilter" onchange="filterAndRender()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
+                        <option value="">전체 종목</option>
+                        <option value="수영">수영</option>
+                        <option value="헬스">헬스/피트니스</option>
+                        <option value="다목적체육관">다목적체육관</option>
+                        <option value="재활스포츠">재활스포츠</option>
+                        <option value="배드민턴">배드민턴</option>
+                        <option value="탁구">탁구</option>
+                        <option value="구기종목">구기종목</option>
                     </select>
+                </div>
+
+                <!-- 4. 키워드 검색 (시설명 및 주소) -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">키워드 검색</label>
+                    <input type="text" id="searchInput" oninput="filterAndRender()" placeholder="예: 센터명, 구 이름 입력" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white font-medium focus:outline-none focus:border-blue-500">
                 </div>
             </div>
         </section>
@@ -159,7 +165,7 @@
         &copy; 2026 All-Fit Sports. All rights reserved. Designed for barrier-free accessibility.
     </footer>
 
-    <!-- 자바스크립트 로직 (실제 정밀 도로명 주소 목록 반영) -->
+    <!-- 자바스크립트 로직 (고도화된 필터 조건 반영) -->
     <script>
         let map = null;
         let geocoder = null;
@@ -168,98 +174,98 @@
         let infowindow = null;
 
         const nationalFacilities = [
-            // 서울특별시 (10개소) - 정확한 실주소 적용
+            // 서울특별시 (10개소)
             { name: "서울반다비체육센터", region: "서울", address: "서울특별시 송파구 올림픽로 424", agency: "서울시설공단", phone: "02-2140-5100", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "https://www.sisul.or.kr" },
             { name: "서울곰두리체육센터", region: "서울", address: "서울특별시 송파구 동남로 271", agency: "한국지체장애인협회", phone: "02-952-6001", voucher: "Y", bandabi: "N", sports: ["수영", "재활스포츠"], homepage: "" },
             { name: "마포어울림체육센터", region: "서울", address: "서울특별시 마포구 월드컵로 240", agency: "마포구시설관리공단", phone: "02-300-5000", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스", "다목적체육관"], homepage: "" },
             { name: "강남장애인수영장", region: "서울", address: "서울특별시 강남구 선릉로 668", agency: "강남구도시관리공단", phone: "02-2176-0800", voucher: "Y", bandabi: "N", sports: ["수영"], homepage: "" },
             { name: "서초여성가족플라자 및 체육센터", region: "서울", address: "서울특별시 서초구 반포대로 37", agency: "서초구청", phone: "02-522-0292", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "요가"], homepage: "" },
-            { name: "종로구올림피아체육센터", region: "서울", address: "서울특별시 종로구 자하문로 300", agency: "종로구시설관리공단", phone: "02-2148-1800", voucher: "Y", bandabi: "N", sports: ["수영", "헬스"], homepage: "" },
-            { name: "성동장애인체육센터", region: "서울", address: "서울특별시 성동구 고산자로 286", agency: "성동구청", phone: "02-2286-5000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "재활"], homepage: "" },
-            { name: "중랑망우체육관", region: "서울", address: "서울특별시 중랑구 망우로 353", agency: "중랑구시설관리공단", phone: "02-2094-0000", voucher: "Y", bandabi: "N", sports: ["배드민턴", "헬스"], homepage: "" },
+            { name: "종로구올림피아체육센터", region: "서울", address: "서울특별시 종로구 자하문로 300", agency: "종로구시설관리공단", phone: "02-2148-1800", voucher: "Y", bandabi: "N", sports: ["수영", "헬스/피트니스"], homepage: "" },
+            { name: "성동장애인체육센터", region: "서울", address: "서울특별시 성동구 고산자로 286", agency: "성동구청", phone: "02-2286-5000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "재활스포츠"], homepage: "" },
+            { name: "중랑망우체육관", region: "서울", address: "서울특별시 중랑구 망우로 353", agency: "중랑구시설관리공단", phone: "02-2094-0000", voucher: "Y", bandabi: "N", sports: ["배드민턴", "헬스/피트니스"], homepage: "" },
             { name: "강서어울림체육관", region: "서울", address: "서울특별시 강서구 화곡로 302", agency: "강서구청", phone: "02-2600-0000", voucher: "Y", bandabi: "N", sports: ["다목적체육관"], homepage: "" },
-            { name: "구로장애인체육센터", region: "서울", address: "서울특별시 구로구 가마산로 265", agency: "구로구시설관리공단", phone: "02-870-0000", voucher: "Y", bandabi: "N", sports: ["수영", "헬스"], homepage: "" },
+            { name: "구로장애인체육센터", region: "서울", address: "서울특별시 구로구 가마산로 265", agency: "구로구시설관리공단", phone: "02-870-0000", voucher: "Y", bandabi: "N", sports: ["수영", "헬스/피트니스"], homepage: "" },
 
             // 경기도 (10개소)
             { name: "경기도어울림체육센터", region: "경기", address: "경기도 수원시 장안구 경수대로 893", agency: "경기도체육회", phone: "031-250-1000", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "구기종목"], homepage: "https://www.ggs.or.kr" },
             { name: "성남시한마음복지관 체육시설", region: "경기", address: "경기도 성남시 분당구 판교로 228", agency: "성남시", phone: "031-725-9500", voucher: "Y", bandabi: "N", sports: ["수영", "헬스/피트니스", "재활스포츠"], homepage: "https://www.withus.or.kr" },
-            { name: "고양시재활스포츠센터", region: "경기", address: "경기도 고양시 덕양구 호국로 790", agency: "고양도시관리공단", phone: "031-969-0110", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "수중운동"], homepage: "" },
+            { name: "고양시재활스포츠센터", region: "경기", address: "경기도 고양시 덕양구 호국로 790", agency: "고양도시관리공단", phone: "031-969-0110", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "재활스포츠"], homepage: "" },
             { name: "용인시처인장애인복지관 체육실", region: "경기", address: "경기도 용인시 처인구 중부대로 1199", agency: "용인시", phone: "031-320-4800", voucher: "Y", bandabi: "N", sports: ["다목적체육관"], homepage: "" },
-            { name: "부천시 장애인종합복지관 체육관", region: "경기", address: "경기도 부천시 소사구 소사로 482", agency: "부천시", phone: "032-340-0700", voucher: "Y", bandabi: "N", sports: ["재활스포츠", "헬스"], homepage: "" },
+            { name: "부천시 장애인종합복지관 체육관", region: "경기", address: "경기도 부천시 소사구 소사로 482", agency: "부천시", phone: "032-340-0700", voucher: "Y", bandabi: "N", sports: ["재활스포츠", "헬스/피트니스"], homepage: "" },
             { name: "안양시반다비체육센터", region: "경기", address: "경기도 안양시 만안구 박달로 525-41", agency: "안양시", phone: "031-8045-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "화성시동탄반다비센터", region: "경기", address: "경기도 화성시 동탄반석로 160", agency: "화성도시공사", phone: "031-8012-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "화성시동탄반다비센터", region: "경기", address: "경기도 화성시 동탄반석로 160", agency: "화성도시공사", phone: "031-8012-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "남양주반다비체육센터", region: "경기", address: "경기도 남양주시 다산중앙로 82", agency: "남양주도시공사", phone: "031-560-0000", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "수영"], homepage: "" },
-            { name: "평택시남부복지타운 체육관", region: "경기", address: "경기도 평택시 비전로 300", agency: "평택시", phone: "031-8024-0000", voucher: "Y", bandabi: "N", sports: ["탁구", "헬스"], homepage: "" },
+            { name: "평택시남부복지타운 체육관", region: "경기", address: "경기도 평택시 비전로 300", agency: "평택시", phone: "031-8024-0000", voucher: "Y", bandabi: "N", sports: ["탁구", "헬스/피트니스"], homepage: "" },
             { name: "의정부시상록수체육관", region: "경기", address: "경기도 의정부시 호국로 1650", agency: "의정부도시공사", phone: "031-828-0000", voucher: "Y", bandabi: "N", sports: ["구기종목", "다목적체육관"], homepage: "" },
 
             // 부산광역시 (5개소)
             { name: "부산사직어울림체육관", region: "부산", address: "부산광역시 동래구 사직로 55", agency: "부산시설공단", phone: "051-860-7800", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "https://www.bisco.or.kr" },
-            { name: "부산시민체육관 장애인교실", region: "부산", address: "부산광역시 부산진구 중앙대로 959", agency: "부산광역시체육회", phone: "051-805-4746", voucher: "Y", bandabi: "N", sports: ["체력단련", "탁구"], homepage: "" },
+            { name: "부산시민체육관 장애인교실", region: "부산", address: "부산광역시 부산진구 중앙대로 959", agency: "부산광역시체육회", phone: "051-805-4746", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스", "탁구"], homepage: "" },
             { name: "해운대구 반다비체육센터", region: "부산", address: "부산광역시 해운대구 센텀중앙로 79", agency: "해운대구청", phone: "051-749-4000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "금정구반다비체육센터", region: "부산", address: "부산광역시 금정구 중앙대로 1777", agency: "금정구청", phone: "051-519-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "금정구반다비체육센터", region: "부산", address: "부산광역시 금정구 중앙대로 1777", agency: "금정구청", phone: "051-519-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "사상구국민체육센터 장애인관", region: "부산", address: "부산광역시 사상구 낙동대로 1430", agency: "사상구청", phone: "051-310-0000", voucher: "Y", bandabi: "N", sports: ["다목적체육관"], homepage: "" },
 
             // 인천광역시 (4개소)
             { name: "인천장애인국민체육센터", region: "인천", address: "인천광역시 서구 염곡로 314", agency: "인천광역시장애인체육회", phone: "032-563-7000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관", "헬스/피트니스"], homepage: "https://www.icsid.or.kr" },
             { name: "남동국민체육센터 장애인편의시설", region: "인천", address: "인천광역시 남동구 소래로 500", agency: "남동구시설관리공단", phone: "032-453-2100", voucher: "Y", bandabi: "N", sports: ["배드민턴", "다목적체육관"], homepage: "" },
-            { name: "연수구반다비체육센터", region: "인천", address: "인천광역시 연수구 원인재로 115", agency: "연수구청", phone: "032-749-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적"], homepage: "" },
-            { name: "계양구어울림체육관", region: "인천", address: "인천광역시 계양구 장제로 884", agency: "계양구시설관리공단", phone: "032-450-0000", voucher: "Y", bandabi: "N", sports: ["헬스", "탁구"], homepage: "" },
+            { name: "연수구반다비체육센터", region: "인천", address: "인천광역시 연수구 원인재로 115", agency: "연수구청", phone: "032-749-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
+            { name: "계양구어울림체육관", region: "인천", address: "인천광역시 계양구 장제로 884", agency: "계양구시설관리공단", phone: "032-450-0000", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스", "탁구"], homepage: "" },
 
             // 대구광역시 (4개소)
             { name: "대구광역시장애인국민체육센터", region: "대구", address: "대구광역시 북구 호국로 225", agency: "대구광역시장애인체육회", phone: "053-383-8030", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "구기종목"], homepage: "" },
-            { name: "달서구반다비체육센터", region: "대구", address: "대구광역시 달서구 공원로 51", agency: "달서구청", phone: "053-667-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "달서구반다비체육센터", region: "대구", address: "대구광역시 달서구 공원로 51", agency: "달서구청", phone: "053-667-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "수성구반다비체육센터", region: "대구", address: "대구광역시 수성구 달구벌대로 2450", agency: "수성구청", phone: "053-666-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "동구아름다운체육관", region: "대구", address: "대구광역시 동구 화랑로 525", agency: "동구청", phone: "053-662-0000", voucher: "Y", bandabi: "N", sports: ["헬스", "요가"], homepage: "" },
+            { name: "동구아름다운체육관", region: "대구", address: "대구광역시 동구 화랑로 525", agency: "동구청", phone: "053-662-0000", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스"], homepage: "" },
 
             // 광주광역시 (3개소)
             { name: "광주빛고을국민체육센터", region: "광주", address: "광주광역시 서구 화운로 290", agency: "광주광역시장애인체육회", phone: "062-600-3800", voucher: "Y", bandabi: "Y", sports: ["수영", "재활스포츠", "다목적체육관"], homepage: "" },
-            { name: "남구종합체육시설 장애인관", region: "광주", address: "광주광역시 남구 회재로 1185", agency: "남구청", phone: "062-607-4000", voucher: "Y", bandabi: "N", sports: ["헬스", "다목적체육관"], homepage: "" },
-            { name: "북구반다비체육센터", region: "광주", address: "광주광역시 북구 서암대로 100", agency: "북구청", phone: "062-410-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적"], homepage: "" },
+            { name: "남구종합체육시설 장애인관", region: "광주", address: "광주광역시 남구 회재로 1185", agency: "남구청", phone: "062-607-4000", voucher: "Y", bandabi: "N", sports: ["헬스/피트니스", "다목적체육관"], homepage: "" },
+            { name: "북구반다비체육센터", region: "광주", address: "광주광역시 북구 서암대로 100", agency: "북구청", phone: "062-410-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
 
             // 대전광역시 (3개소)
             { name: "대전반다비체육센터", region: "대전", address: "대전광역시 서구 대덕대로 176", agency: "대전광역시", phone: "042-270-1114", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
-            { name: "한밭장애인국민체육센터", region: "대전", address: "대전광역시 동구 충정로 53", agency: "대전장애인체육회", phone: "042-253-8000", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "농구"], homepage: "" },
-            { name: "유성구반다비체육센터", region: "대전", address: "대전광역시 유성구 대학로 99", agency: "유성구청", phone: "042-611-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "한밭장애인국민체육센터", region: "대전", address: "대전광역시 동구 충정로 53", agency: "대전장애인체육회", phone: "042-253-8000", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "구기종목"], homepage: "" },
+            { name: "유성구반다비체육센터", region: "대전", address: "대전광역시 유성구 대학로 99", agency: "유성구청", phone: "042-611-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
 
             // 울산광역시 (2개소)
             { name: "울산문수장애인체육관", region: "울산", address: "울산광역시 남구 문수볼트로 44", agency: "울산광역시장애인체육회", phone: "052-262-4000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "구기종목"], homepage: "" },
-            { name: "울산중구반다비체육센터", region: "울산", address: "울산광역시 중구 번영로 35", agency: "중구청", phone: "052-290-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적"], homepage: "" },
+            { name: "울산중구반다비체육센터", region: "울산", address: "울산광역시 중구 번영로 35", agency: "중구청", phone: "052-290-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
 
             // 강원특별자치도 (4개소)
             { name: "강원도장애인국민체육센터", region: "강원", address: "강원특별자치도 춘천시 공지로 513", agency: "강원도장애인체육회", phone: "033-255-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "강릉시반다비체육센터", region: "강원", address: "강원특별자치도 강릉시 종합운동장길 69", agency: "강릉시", phone: "033-660-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "원주반다비체육센터", region: "강원", address: "강원특별자치도 원주시 서원대로 399", agency: "원주시", phone: "033-737-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "원주반다비체육센터", region: "강원", address: "강원특별자치도 원주시 서원대로 399", agency: "원주시", phone: "033-737-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "속초반다비체육센터", region: "강원", address: "강원특별자치도 속초시 장사동 550-1", agency: "속초시", phone: "033-639-0000", voucher: "Y", bandabi: "Y", sports: ["다목적체육관", "수영"], homepage: "" },
 
             // 충청북도 (3개소)
             { name: "충청북도장애인체육관", region: "충북", address: "충청북도 청주시 청원구 사뜸로 103", agency: "충청북도장애인체육회", phone: "043-298-8000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "구기종목"], homepage: "" },
-            { name: "충주반다비체육센터", region: "충북", address: "충청북도 충주시 금봉대로 560", agency: "충주시", phone: "043-850-7000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
-            { name: "제천반다비체육센터", region: "충북", address: "충청북도 제천시 의림대로 300", agency: "제천시", phone: "043-641-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적"], homepage: "" },
+            { name: "충주반다비체육센터", region: "충북", address: "충청북도 충주시 금봉대로 560", agency: "충주시", phone: "043-850-7000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
+            { name: "제천반다비체육센터", region: "충북", address: "충청북도 제천시 의림대로 300", agency: "제천시", phone: "043-641-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
 
             // 충청남도 (3개소)
             { name: "충남남부장애인국민체육센터", region: "충남", address: "충청남도 공주시 반포면 구룡사로 31", agency: "충청남도", phone: "041-850-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "아산시반다비체육센터", region: "충남", address: "충청남도 아산시 실내체육로 135", agency: "아산시", phone: "041-540-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "아산시반다비체육센터", region: "충남", address: "충청남도 아산시 실내체육로 135", agency: "아산시", phone: "041-540-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "천안반다비체육센터", region: "충남", address: "충청남도 천안시 동남구 번영로 200", agency: "천안시", phone: "041-521-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
 
             // 전북특별자치도 (3개소)
             { name: "전북장애인국민체육센터", region: "전북", address: "전북특별자치도 전주시 덕진구 기린대로 1055", agency: "전라북도장애인체육회", phone: "063-251-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "재활스포츠"], homepage: "" },
             { name: "익산반다비체육센터", region: "전북", address: "전북특별자치도 익산시 무왕로 1397", agency: "익산시", phone: "063-859-4000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "군산반다비체육센터", region: "전북", address: "전북특별자치도 군산시 대학로 330", agency: "군산시", phone: "063-454-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "군산반다비체육센터", region: "전북", address: "전북특별자치도 군산시 대학로 330", agency: "군산시", phone: "063-454-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
 
             // 전라남도 (3개소)
             { name: "전남장애인국민체육센터", region: "전남", address: "전라남도 목포시 영산로 696", agency: "전라남도장애인체육회", phone: "061-287-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "순천시반다비체육센터", region: "전남", address: "전라남도 순천시 팔마로 345", agency: "순천시", phone: "061-749-3000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
-            { name: "여수반다비체육센터", region: "전남", address: "전라남도 여수시 시청로 1", agency: "여수시", phone: "061-659-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적"], homepage: "" },
+            { name: "순천시반다비체육센터", region: "전남", address: "전라남도 순천시 팔마로 345", agency: "순천시", phone: "061-749-3000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
+            { name: "여수반다비체육센터", region: "전남", address: "전라남도 여수시 시청로 1", agency: "여수시", phone: "061-659-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
 
             // 경상북도 (3개소)
             { name: "경상북도장애인체육관", region: "경북", address: "경상북도 안동시 앙실로 11", agency: "경상북도장애인체육회", phone: "054-850-8000", voucher: "Y", bandabi: "N", sports: ["다목적체육관", "구기종목"], homepage: "" },
-            { name: "포항반다비체육센터", region: "경북", address: "경상북도 포항시 남구 희망대로 810", agency: "포항시", phone: "054-270-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "포항반다비체육센터", region: "경북", address: "경상북도 포항시 남구 희망대로 810", agency: "포항시", phone: "054-270-2000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
             { name: "구미반다비체육센터", region: "경북", address: "경상북도 구미시 송정동 463", agency: "구미시", phone: "054-480-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
 
             // 경상남도 (3개소)
             { name: "경남 양산반다비체육센터", region: "경남", address: "경상남도 양산시 물금읍 범어리 2750", agency: "양산시시설관리공단", phone: "055-379-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "" },
             { name: "창원시장애인국민체육센터", region: "경남", address: "경상남도 창원시 의창구 원이대로 450", agency: "창원시", phone: "055-225-7000", voucher: "Y", bandabi: "Y", sports: ["수영", "다목적체육관"], homepage: "" },
-            { name: "진주반다비체육센터", region: "경남", address: "경상남도 진주시 동진로 156", agency: "진주시", phone: "055-749-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스"], homepage: "" },
+            { name: "진주반다비체육센터", region: "경남", address: "경상남도 진주시 동진로 156", agency: "진주시", phone: "055-749-0000", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스"], homepage: "" },
 
             // 제주특별자치도 (2개소)
             { name: "제주랑데뷰장애인체육센터", region: "제주", address: "제주특별자치도 제주시 애월읍 상가로 1", agency: "제주특별자치도장애인체육회", phone: "064-753-8000", voucher: "Y", bandabi: "Y", sports: ["수영", "재활스포츠"], homepage: "" },
@@ -292,14 +298,12 @@
                 lng: null
             }));
 
-            // 실주소 기반 카카오 Geocoder 변환 실행
             allFacilities.forEach((facility, index) => {
                 geocoder.addressSearch(facility.address, function(result, status) {
                     if (status === kakao.maps.services.Status.OK) {
                         allFacilities[index].lat = parseFloat(result[0].y);
                         allFacilities[index].lng = parseFloat(result[0].x);
                     } else {
-                        // 예외 대비 기본 좌표
                         allFacilities[index].lat = 37.566826;
                         allFacilities[index].lng = 126.978656;
                     }
@@ -313,19 +317,20 @@
 
         function filterAndRender() {
             const regionVal = document.getElementById('regionFilter').value;
-            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
             const voucherVal = document.getElementById('voucherFilter').value;
-            const bandabiVal = document.getElementById('bandabiFilter').value;
+            const sportVal = document.getElementById('sportFilter').value;
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
 
             const filtered = allFacilities.filter(f => {
                 const matchRegion = regionVal ? f.region.includes(regionVal) : true;
-                const matchSearch = searchVal ? f.name.toLowerCase().includes(searchVal) || f.address.toLowerCase().includes(searchVal) || f.sports.some(s => s.toLowerCase().includes(searchVal)) : true;
                 const matchVoucher = voucherVal ? f.voucher === voucherVal : true;
-                const matchBandabi = bandabiVal ? f.bandabi === bandabiVal : true;
-                return matchRegion && matchSearch && matchVoucher && matchBandabi;
+                const matchSport = sportVal ? f.sports.some(s => s.includes(sportVal)) : true;
+                const matchSearch = searchVal ? f.name.toLowerCase().includes(searchVal) || f.address.toLowerCase().includes(searchVal) || f.agency.toLowerCase().includes(searchVal) : true;
+                
+                return matchRegion && matchVoucher && matchSport && matchSearch;
             });
 
-            document.getElementById('facilityCount').innerText = `전국 검색 결과: ${filtered.length}개소 (실주소 정밀 연동 완료)`;
+            document.getElementById('facilityCount').innerText = `검색 결과: ${filtered.length}개소`;
             renderListAndMarkers(filtered);
         }
 
