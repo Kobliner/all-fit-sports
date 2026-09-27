@@ -3,563 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>모두의 체육 - 누구나 누리는 모두의 체육</title>
+    <title>All-Fit Sports - 장애인 체육시설 통합 플랫폼</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome 아이콘 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 카카오맵 API (https 명시) -->
-    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=c5fcde2a37955d200e85806d94a2a4a4&libraries=services"></script>
+    <!-- Kakao Maps SDK (your app key) -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=14d59f274a44cc2180cd2f7e4c7d0d09&libraries=services"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- 네비게이션 바 -->
+    <!-- 상단 네비게이션 -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
-                <div class="bg-indigo-600 text-white p-2 rounded-xl flex items-center justify-center shadow-md">
-                    <i class="fa-solid fa-hands-holding-child text-xl"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-indigo-900">모두의 체육</span>
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
+                <span class="text-2xl font-black text-blue-600">All-Fit</span>
+                <span class="text-sm font-semibold text-slate-500">배리어프리 체육</span>
             </div>
-            <nav class="hidden md:flex items-center space-x-8 font-medium">
-                <button onclick="showPage('home')" class="nav-link text-indigo-600 font-semibold transition hover:text-indigo-600">홈</button>
-                <button onclick="showPage('facilities')" class="nav-link text-slate-600 transition hover:text-indigo-600">실시간 체육시설 찾기</button>
-                <button onclick="showPage('matching')" class="nav-link text-slate-600 transition hover:text-indigo-600">체육 도우미 매칭</button>
-                <button onclick="showPage('mypage')" class="nav-link text-slate-600 transition hover:text-indigo-600">마이페이지</button>
+            <nav class="flex space-x-6 text-sm font-medium">
+                <button onclick="showPage('home')" class="hover:text-blue-600 transition">홈</button>
+                <button onclick="showPage('facilities')" class="hover:text-blue-600 transition">체육시설 찾기</button>
             </nav>
-            <div class="flex items-center space-x-3">
-                <button onclick="showPage('mypage')" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-medium text-sm hover:bg-slate-200 transition">
-                    <i class="fa-solid fa-user mr-1.5"></i> 내 정보
-                </button>
-                <button onclick="alert('로그인 모달이 열립니다.')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-sm hover:bg-indigo-700 transition">
-                    로그인
-                </button>
-            </div>
         </div>
     </header>
 
-    <!-- 메인 컨텐츠 영역 -->
-    <main class="flex-grow">
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4">
 
         <!-- 1. 홈 페이지 -->
-        <div id="page-home" class="page-section">
-            <section class="relative bg-gradient-to-br from-indigo-900 via-indigo-800 to-blue-900 text-white py-20 px-4 sm:px-6 lg:px-8">
-                <div class="max-w-4xl mx-auto text-center space-y-6">
-                    <span class="bg-indigo-500/30 text-indigo-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-indigo-400/30">
-                        대한민국 장애인 생활체육 통합 플랫폼
-                    </span>
-                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-                        누구나 누리는 모두의 체육
-                    </h1>
-                    <p class="text-lg text-indigo-100 max-w-2xl mx-auto font-light">
-                        내 주변 접근 가능한 체육시설 정보부터 든든한 체육 도우미 매칭까지, 한 곳에서 쉽고 빠르게 이용하세요.
-                    </p>
+        <section id="page-home" class="py-12 text-center">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-4 text-slate-900">
+                모두를 위한 체육시설 안내 플랫폼
+            </h1>
+            <p class="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
+                대한장애인체육회 공공데이터와 연동하여 전국 장애인 전용 체육시설의 위치와 정보를 한눈에 확인하세요.
+            </p>
+            <button onclick="showPage('facilities')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition">
+                실시간 체육시설 찾기 시작하기
+            </button>
+        </section>
 
-                    <!-- 통합 빠른 검색 바 -->
-                    <div class="bg-white text-slate-800 p-4 rounded-2xl shadow-2xl mt-8 max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
-                        <div class="text-left px-2">
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">지역 선택</label>
-                            <select id="quick-region" class="w-full bg-transparent font-medium text-slate-700 focus:outline-none">
-                                <option value="">전체 지역</option>
-                                <option value="서울">서울특별시</option>
-                                <option value="경기">경기도</option>
-                                <option value="인천">인천광역시</option>
-                                <option value="부산">부산광역시</option>
-                            </select>
-                        </div>
-                        <div class="text-left px-2 border-t sm:border-t-0 sm:border-l border-slate-200 pt-2 sm:pt-0">
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">종목 선택</label>
-                            <select id="quick-sport" class="w-full bg-transparent font-medium text-slate-700 focus:outline-none">
-                                <option value="">모든 종목</option>
-                                <option value="수영">수영</option>
-                                <option value="헬스">헬스/피트니스</option>
-                                <option value="탁구">탁구</option>
-                            </select>
-                        </div>
-                        <div class="text-left px-2 border-t sm:border-t-0 sm:border-l border-slate-200 pt-2 sm:pt-0">
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">필수 편의시설</label>
-                            <select id="quick-amenity" class="w-full bg-transparent font-medium text-slate-700 focus:outline-none">
-                                <option value="">선택 안 함</option>
-                                <option value="elevator">승강설비 (엘리베이터)</option>
-                                <option value="toilet">장애인 화장실</option>
-                            </select>
-                        </div>
-                        <div>
-                            <button onclick="executeQuickSearch()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <span>시설 찾기</span>
-                            </button>
-                        </div>
-                    </div>
+        <!-- 2. 체육시설 찾기 페이지 -->
+        <section id="page-facilities" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">전국 장애인 체육시설 찾기</h2>
+                    <p class="text-sm text-slate-500">공공데이터포털 실시간 연동 데이터입니다.</p>
                 </div>
-            </section>
-
-            <!-- 퀵 카드 섹션 -->
-            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div class="text-center mb-12">
-                    <h2 class="text-2xl font-bold text-slate-900">맞춤형 빠른 추천</h2>
-                    <p class="text-slate-500 mt-1">원하시는 조건을 클릭하시면 즉시 해당 시설 목록으로 연결됩니다.</p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div onclick="filterAndGoToFacilities('수영', '')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-indigo-300 transition cursor-pointer group">
-                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
-                            <i class="fa-solid fa-person-swimming text-xl"></i>
-                        </div>
-                        <h3 class="font-bold text-lg text-slate-800 mb-1">장애인 수영장</h3>
-                        <p class="text-sm text-slate-500">경사로 및 입수용 리프트가 설치된 수영장</p>
-                    </div>
-                    <div onclick="filterAndGoToFacilities('', 'elevator')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-indigo-300 transition cursor-pointer group">
-                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
-                            <i class="fa-solid fa-elevator text-xl"></i>
-                        </div>
-                        <h3 class="font-bold text-lg text-slate-800 mb-1">승강설비 완비</h3>
-                        <p class="text-sm text-slate-500">층간 이동이 편리한 엘리베이터 보유 시설</p>
-                    </div>
-                    <div onclick="filterAndGoToFacilities('', 'toilet')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-indigo-300 transition cursor-pointer group">
-                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
-                            <i class="fa-solid fa-restroom text-xl"></i>
-                        </div>
-                        <h3 class="font-bold text-lg text-slate-800 mb-1">장애인 화장실</h3>
-                        <p class="text-sm text-slate-500">전용 화장실과 편의 시설이 갖추어진 체육관</p>
-                    </div>
-                    <div onclick="filterAndGoToFacilities('', 'parking')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-indigo-300 transition cursor-pointer group">
-                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
-                            <i class="fa-solid fa-square-parking text-xl"></i>
-                        </div>
-                        <h3 class="font-bold text-lg text-slate-800 mb-1">전용 주차장</h3>
-                        <p class="text-sm text-slate-500">주차 구역과 주출입구가 가까운 편리한 시설</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- 2. 실시간 체육시설 찾기 페이지 -->
-        <div id="page-facilities" class="page-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-slate-900">실시간 체육시설 찾기</h1>
-                <p class="text-slate-500 text-sm mt-1">내 주변의 장애인 친화 체육시설 위치와 편의시설 정보를 실시간으로 확인하세요.</p>
-            </div>
-
-            <!-- 필터 바 -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap gap-4 items-center justify-between">
-                <div class="flex flex-wrap gap-3 items-center">
-                    <select id="filter-region" onchange="renderFacilities()" class="bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded-lg px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <!-- 지역 필터 -->
+                <div class="flex gap-2">
+                    <select id="regionFilter" onchange="filterFacilities()" class="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
                         <option value="">전체 지역</option>
                         <option value="서울">서울</option>
                         <option value="경기">경기</option>
                         <option value="부산">부산</option>
-                    </select>
-                    <select id="filter-sport" onchange="renderFacilities()" class="bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded-lg px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="">모든 종목</option>
-                        <option value="수영">수영</option>
-                        <option value="헬스">헬스</option>
-                        <option value="탁구">탁구</option>
+                        <option value="인천">인천</option>
+                        <option value="대구">대구</option>
                     </select>
                 </div>
-                <div class="flex items-center space-x-2 text-sm text-slate-600">
-                    <span class="font-semibold text-indigo-600" id="facility-count">0개</span> 시설 검색됨
-                </div>
             </div>
 
-            <!-- 지도 및 리스트 분할 레이아웃 -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- 실제 지도가 렌더링될 영역 -->
-                <div class="lg:col-span-5 bg-slate-200 rounded-2xl h-[450px] lg:h-[600px] relative overflow-hidden border border-slate-300 shadow-inner" id="map">
-                    <!-- 카카오맵 API가 로드되지 않았을 경우 대체 안내 문구 -->
-                    <div id="map-fallback" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-100 text-slate-500 z-10">
-                        <i class="fa-solid fa-map-location-dot text-4xl text-indigo-500 mb-2"></i>
-                        <p class="font-bold text-slate-700">카카오맵 연동 대기 중</p>
-                        <p class="text-xs mt-1">앱 키(App Key)를 입력하면 실제 지도가 이곳에 출력됩니다.<br>(현재는 가상 마커 리스트 연동 모드로 동작합니다)</p>
-                    </div>
+            <!-- 지도와 리스트 레이아웃 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 지도 영역 -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[450px]">
+                    <div id="map" class="w-full h-full"></div>
                 </div>
-
-                <!-- 시설 리스트 카드 영역 -->
-                <div class="lg:col-span-7 space-y-4 max-h-[600px] overflow-y-auto pr-2" id="facility-list-container">
-                    <!-- 자바스크립트로 동적 렌더링 -->
+                <!-- 시설 리스트 영역 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-[450px] overflow-y-auto space-y-3" id="facilityList">
+                    <div class="text-center text-slate-400 py-16">공공데이터를 불러오는 중입니다...</div>
                 </div>
             </div>
-        </div>
-
-        <!-- 3. 체육 도우미 매칭 페이지 -->
-        <div id="page-matching" class="page-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-900">체육 도우미 매칭</h1>
-                    <p class="text-slate-500 text-sm mt-1">운동 동행이나 보조가 필요한 분과 도우미 자원자를 연결해 드립니다.</p>
-                </div>
-                <button onclick="openMatchingModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>매칭 신청/등록하기</span>
-                </button>
-            </div>
-
-            <div class="flex border-b border-slate-200 mb-6">
-                <button onclick="switchMatchingTab('all')" id="tab-all" class="py-2.5 px-4 font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm transition">전체 보기</button>
-                <button onclick="switchMatchingTab('request')" id="tab-request" class="py-2.5 px-4 font-medium text-slate-500 hover:text-slate-700 text-sm transition">도움 요청 (구인)</button>
-                <button onclick="switchMatchingTab('volunteer')" id="tab-volunteer" class="py-2.5 px-4 font-medium text-slate-500 hover:text-slate-700 text-sm transition">도우미 지원 (구직)</button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="matching-list-container">
-                <!-- 동적 렌더링 -->
-            </div>
-        </div>
-
-        <!-- 4. 마이페이지 -->
-        <div id="page-mypage" class="page-section hidden max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 mb-8 flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold">
-                        김민
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-slate-900">김민수 회원님</h1>
-                        <p class="text-sm text-slate-500">일반 회원 (장애인 체육 이용자)</p>
-                    </div>
-                </div>
-                <button onclick="alert('프로필 수정 기능')" class="border border-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-50 transition">프로필 수정</button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-lg text-slate-900 mb-4 flex items-center">
-                        <i class="fa-solid fa-bookmark text-indigo-600 mr-2"></i> 즐겨찾는 체육시설
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
-                            <div>
-                                <p class="font-semibold text-slate-800 text-sm">서울어울림체육센터</p>
-                                <p class="text-xs text-slate-500">서울 마포구 • 수영, 헬스</p>
-                            </div>
-                            <span class="text-indigo-600 text-xs font-semibold bg-indigo-50 px-2.5 py-1 rounded-full">이용중</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-lg text-slate-900 mb-4 flex items-center">
-                        <i class="fa-solid fa-handshake text-indigo-600 mr-2"></i> 나의 매칭 신청 내역
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
-                            <div>
-                                <p class="font-semibold text-slate-800 text-sm">[수영 동행] 주말 수영 보조</p>
-                                <p class="text-xs text-slate-500">매칭 대기중 • 서울 마포구</p>
-                            </div>
-                            <span class="text-amber-600 text-xs font-semibold bg-amber-50 px-2.5 py-1 rounded-full">대기중</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
 
     </main>
 
-    <!-- 시설 상세 정보 모달 -->
-    <div id="facility-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
-            <button onclick="closeFacilityModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-            <div id="modal-content"></div>
-        </div>
-    </div>
-
-    <!-- 매칭 신청 모달 -->
-    <div id="matching-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button onclick="closeMatchingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-            <h3 class="text-lg font-bold text-slate-900 mb-4">체육 도우미 매칭 신청</h3>
-            <form onsubmit="submitMatching(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">구분</label>
-                    <select id="match-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm">
-                        <option value="request">도움 요청하기 (구인)</option>
-                        <option value="volunteer">도우미 지원하기 (구직)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">제목</label>
-                    <input type="text" id="match-title" required placeholder="예: 토요일 수영장 이동 및 운동 보조 구합니다" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">지역 및 장소</label>
-                    <input type="text" id="match-location" required placeholder="예: 서울 마포구 어울림체육센터" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">상세 내용</label>
-                    <textarea id="match-desc" rows="3" required placeholder="필요한 도움이나 운동 종목을 적어주세요." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition text-sm shadow-sm">
-                    등록하기
-                </button>
-            </form>
-        </div>
-    </div>
-
     <!-- 푸터 -->
-    <footer class="bg-white border-t border-slate-200 mt-16 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
-            <p class="font-semibold text-slate-700 mb-1">모두의 체육 (All-Fit Sports)</p>
-            <p>장애와 편견 없이 누구나 자유롭게 즐기는 스포츠 환경을 만들어 갑니다.</p>
-            <p class="mt-4 text-xs text-slate-400">&copy; 2026 모두의 체육 플랫폼. All rights reserved.</p>
-        </div>
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        &copy; 2026 All-Fit Sports. All rights reserved.
     </footer>
 
-    <!-- 자바스크립트 및 지도 연동 로직 -->
+    <!-- 자바스크립트 로직 -->
     <script>
-        // 실제 위경도 좌표가 포함된 체육시설 데이터셋
-        const facilitiesData = [
-            { id: 1, name: "서울어울림체육센터", region: "서울", sport: "수영", distance: "1.2km", lat: 37.5547, lng: 126.9707, elevator: true, toilet: true, parking: true, ramp: true, phone: "02-555-1234", hours: "06:00 - 21:00" },
-            { id: 2, name: "서초 실내체육관", region: "서울", sport: "헬스", distance: "2.5km", lat: 37.4836, lng: 127.0327, elevator: true, toilet: true, parking: false, ramp: true, phone: "02-333-5678", hours: "09:00 - 22:00" },
-            { id: 3, name: "경기 남부 장애인국민체육센터", region: "경기", sport: "수영", distance: "5.1km", lat: 37.2635, lng: 127.0286, elevator: true, toilet: true, parking: true, ramp: true, phone: "031-123-4567", hours: "07:00 - 20:00" },
-            { id: 4, name: "부산 해운대 어울림센터", region: "부산", sport: "탁구", distance: "3.8km", lat: 35.1631, lng: 129.1636, elevator: true, toilet: false, parking: true, ramp: true, phone: "051-987-6543", hours: "09:00 - 18:00" },
-        ];
-
         let map = null;
         let markers = [];
+        let facilitiesData = [];
 
         // 페이지 전환 함수
         function showPage(pageId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById('page-' + pageId).classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-facilities').classList.add('hidden');
+            
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
 
             if (pageId === 'facilities') {
-                // DOM이 그려질 수 있도록 약간의 여유를 둔 뒤 지도 초기화 및 렌더링 수행
+                // 지도가 숨겨져 있다가 보일 때 크기 깨짐 방지 및 지도 초기화
                 setTimeout(() => {
-                    initMapIfNeeded();
-                    renderFacilities();
-                }, 50);
-            } else if (pageId === 'matching') {
-                renderMatching('all');
+                    if (!map) {
+                        initMap();
+                    } else {
+                        map.relayout();
+                    }
+                }, 100);
             }
         }
 
-        // 카카오맵 초기화 함수
-        function initMapIfNeeded() {
-            if (typeof kakao !== 'undefined' && kakao.maps) {
-                const container = document.getElementById('map');
+        // 카카오맵 초기화
+        function initMap() {
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.566826, 126.978656), // 서울 중심 좌표
+                level: 7
+            };
+            map = new kakao.maps.Map(container, options);
+
+            // 지도 생성 후 공공데이터 호출 시작
+            fetchFacilitiesData();
+        }
+
+        // 서버less API를 통해 공공데이터 가져오기 및 지오코딩 처리
+        async function fetchFacilitiesData() {
+            try {
+                const response = await fetch('/api/facilities');
+                const result = await response.json();
                 
-                if (!map) {
-                    const options = {
-                        center: new kakao.maps.LatLng(37.5547, 126.9707),
-                        level: 7
-                    };
-                    map = new kakao.maps.Map(container, options);
-                } else {
-                    // 이미 생성된 경우 화면 크기 재조정 및 중앙 설정
-                    map.relayout();
-                    map.setCenter(new kakao.maps.LatLng(37.5547, 126.9707));
-                }
+                if (result && result.data) {
+                    const geocoder = new kakao.maps.services.Geocoder();
+                    
+                    // 최대 30개 항목만 우선순위로 지오코딩 및 마커 생성 (부하 방지)
+                    const targetData = result.data.slice(0, 30);
 
-                const fallback = document.getElementById('map-fallback');
-                if (fallback) fallback.style.display = 'none';
+                    targetData.forEach((item, index) => {
+                        const address = item.소재지;
+                        const name = item.시설명;
+                        
+                        if (!address) return;
+
+                        geocoder.addressSearch(address, function(status, data) {
+                            if (status === kakao.maps.services.Status.OK) {
+                                const lat = data[0].y;
+                                const lng = data[0].x;
+
+                                facilitiesData.push({
+                                    id: index + 1,
+                                    name: name,
+                                    region: item.시_도 || "기타",
+                                    address: address,
+                                    lat: parseFloat(lat),
+                                    lng: parseFloat(lng),
+                                    phone: item.전화번호 || "번호 없음",
+                                    voucher: item.장애인스포츠강좌바우처시설 || "N",
+                                    bandabi: item.반다비시설 || "N"
+                                });
+
+                                renderFacilities();
+                            }
+                        });
+                    });
+                }
+            } catch (e) {
+                console.error("데이터 로드 실패:", e);
+                document.getElementById('facilityList').innerHTML = '<div class="text-center text-red-400 py-16">데이터를 불러오지 못했습니다.</div>';
             }
         }
 
-        // 지도에 마커 업데이트 함수
-        function updateMapMarkers(filteredList) {
+        // 시설 목록 및 지도 마커 렌더링
+        function renderFacilities(filterRegion = "") {
+            const listContainer = document.getElementById('facilityList');
+            listContainer.innerHTML = '';
+
+            // 기존 마커 초기화
             markers.forEach(marker => marker.setMap(null));
             markers = [];
 
-            if (typeof kakao === 'undefined' || !kakao.maps || !map) return;
+            const filteredData = filterRegion 
+                ? facilitiesData.filter(f => f.region.includes(filterRegion))
+                : facilitiesData;
+
+            if (filteredData.length === 0) {
+                listContainer.innerHTML = '<div class="text-center text-slate-400 py-16">조건에 맞는 시설이 없습니다.</div>';
+                return;
+            }
 
             const bounds = new kakao.maps.LatLngBounds();
 
-            filteredList.forEach(item => {
-                const coords = new kakao.maps.LatLng(item.lat, item.lng);
+            filteredData.forEach(facility => {
+                // 1. 리스트 HTML 생성
+                const card = document.createElement('div');
+                card.className = "p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition cursor-pointer shadow-sm";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="font-bold text-slate-800 text-sm">${facility.name}</h3>
+                        <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-medium">${facility.region}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-2">${facility.address}</p>
+                    <div class="flex gap-2 text-[11px] text-slate-400">
+                        <span>📞 ${facility.phone}</span>
+                        <span>| 바우처: ${facility.voucher}</span>
+                    </div>
+                `;
+                
+                // 리스트 카드 클릭 시 해당 위치로 지도 이동
+                card.onclick = () => {
+                    const moveLatLon = new kakao.maps.LatLng(facility.lat, facility.lng);
+                    map.setCenter(moveLatLon);
+                    map.setLevel(3);
+                };
+                listContainer.appendChild(card);
+
+                // 2. 카카오맵 마커 생성
+                const markerPosition = new kakao.maps.LatLng(facility.lat, facility.lng);
                 const marker = new kakao.maps.Marker({
-                    map: map,
-                    position: coords,
-                    title: item.name
+                    position: markerPosition
                 });
-
-                kakao.maps.event.addListener(marker, 'click', function() {
-                    openFacilityModal(item.id);
-                });
-
+                marker.setMap(map);
                 markers.push(marker);
-                bounds.extend(coords);
+
+                bounds.extend(markerPosition);
             });
 
-            if (filteredList.length > 0) {
+            // 마커들이 한눈에 보이도록 지도 범위 재설정
+            if (filteredData.length > 0) {
                 map.setBounds(bounds);
             }
         }
 
-        function executeQuickSearch() {
-            const region = document.getElementById('quick-region').value;
-            const sport = document.getElementById('quick-sport').value;
-            
-            document.getElementById('filter-region').value = region;
-            document.getElementById('filter-sport').value = sport;
-
-            showPage('facilities');
-        }
-
-        function filterAndGoToFacilities(sport, amenity) {
-            document.getElementById('filter-region').value = "";
-            document.getElementById('filter-sport').value = sport;
-            showPage('facilities');
-        }
-
-        // 체육시설 렌더링 및 지도 동기화
-        function renderFacilities() {
-            const regionFilter = document.getElementById('filter-region').value;
-            const sportFilter = document.getElementById('filter-sport').value;
-            const container = document.getElementById('facility-list-container');
-
-            const filtered = facilitiesData.filter(item => {
-                return (regionFilter === "" || item.region.includes(regionFilter)) &&
-                       (sportFilter === "" || item.sport.includes(sportFilter));
-            });
-
-            document.getElementById('facility-count').innerText = filtered.length + "개";
-
-            updateMapMarkers(filtered);
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-slate-400 border border-slate-200">조건에 일치하는 체육시설이 없습니다.</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => `
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-300 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">${item.sport}</span>
-                            <span class="text-slate-400 text-xs">• ${item.region} (${item.distance})</span>
-                        </div>
-                        <h3 class="font-bold text-lg text-slate-900">${item.name}</h3>
-                        <div class="flex items-center space-x-3 mt-2 text-xs text-slate-600">
-                            <span class="${item.elevator ? 'text-emerald-600 font-medium' : 'text-slate-300'}"><i class="fa-solid fa-elevator mr-1"></i>승강기</span>
-                            <span class="${item.toilet ? 'text-emerald-600 font-medium' : 'text-slate-300'}"><i class="fa-solid fa-restroom mr-1"></i>장애인화장실</span>
-                            <span class="${item.parking ? 'text-emerald-600 font-medium' : 'text-slate-300'}"><i class="fa-solid fa-square-parking mr-1"></i>전용주차</span>
-                            <span class="${item.ramp ? 'text-emerald-600 font-medium' : 'text-slate-300'}"><i class="fa-solid fa-wheelchair mr-1"></i>경사로</span>
-                        </div>
-                    </div>
-                    <button onclick="openFacilityModal(${item.id})" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 font-medium px-4 py-2.5 rounded-xl text-sm transition text-center">
-                        상세보기
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        // 매칭 데이터 및 모달 로직
-        let matchingData = [
-            { id: 1, type: "request", title: "주말 수영 강습 동행 및 이동 보조 구합니다", location: "서울 마포구", author: "김지수", status: "매칭 대기중", desc: "주말마다 수영장까지 이동하고 탈의 및 입수를 도와주실 도우미분이 필요합니다." },
-            { id: 2, type: "volunteer", title: "주말 헬스 및 운동 보조 자원봉사 가능합니다", location: "서울 강남구", author: "박도준", status: "모집중", desc: "체육 지도자 자격증 보유 중이며, 주말에 헬스 보조 봉사 희망합니다." }
-        ];
-
-        function openFacilityModal(id) {
-            const item = facilitiesData.find(f => f.id === id);
-            if (!item) return;
-
-            document.getElementById('modal-content').innerHTML = `
-                <span class="bg-indigo-50 text-indigo-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">${item.sport}</span>
-                <h2 class="text-xl font-bold text-slate-900 mt-2 mb-1">${item.name}</h2>
-                <p class="text-sm text-slate-500 mb-4"><i class="fa-solid fa-location-dot mr-1"></i> ${item.region} 지역 (${item.distance} 거리)</p>
-                
-                <div class="space-y-3 bg-slate-50 p-4 rounded-xl text-sm mb-6 border border-slate-100">
-                    <div class="flex justify-between"><span class="text-slate-500">운영 시간</span><span class="font-medium">${item.hours}</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500">문의 전화</span><span class="font-medium">${item.phone}</span></div>
-                </div>
-
-                <h4 class="font-bold text-sm text-slate-800 mb-2">접근성 및 편의시설 정보</h4>
-                <div class="grid grid-cols-2 gap-2 text-xs mb-6">
-                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between"><span>엘리베이터</span><span class="${item.elevator ? 'text-emerald-600 font-bold' : 'text-slate-400'}">${item.elevator ? '설치 ⭕' : '없음 ❌'}</span></div>
-                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between"><span>장애인 화장실</span><span class="${item.toilet ? 'text-emerald-600 font-bold' : 'text-slate-400'}">${item.toilet ? '설치 ⭕' : '없음 ❌'}</span></div>
-                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between"><span>전용 주차장</span><span class="${item.parking ? 'text-emerald-600 font-bold' : 'text-slate-400'}">${item.parking ? '설치 ⭕' : '없음 ❌'}</span></div>
-                    <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between"><span>주출입구 경사로</span><span class="${item.ramp ? 'text-emerald-600 font-bold' : 'text-slate-400'}">${item.ramp ? '설치 ⭕' : '없음 ❌'}</span></div>
-                </div>
-
-                <div class="flex space-x-3">
-                    <button onclick="alert('카카오 길찾기 서비스와 연동됩니다.')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl text-sm transition">길찾기 / 지도보기</button>
-                    <button onclick="closeFacilityModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-sm transition">닫기</button>
-                </div>
-            `;
-            document.getElementById('facility-modal').classList.remove('hidden');
-            document.getElementById('facility-modal').classList.add('flex');
-        }
-
-        function closeFacilityModal() {
-            document.getElementById('facility-modal').classList.add('hidden');
-            document.getElementById('facility-modal').classList.remove('flex');
-        }
-
-        function switchMatchingTab(type) {
-            document.getElementById('tab-all').className = "py-2.5 px-4 font-medium text-slate-500 hover:text-slate-700 text-sm transition border-b-2 border-transparent";
-            document.getElementById('tab-request').className = "py-2.5 px-4 font-medium text-slate-500 hover:text-slate-700 text-sm transition border-b-2 border-transparent";
-            document.getElementById('tab-volunteer').className = "py-2.5 px-4 font-medium text-slate-500 hover:text-slate-700 text-sm transition border-b-2 border-transparent";
-
-            document.getElementById('tab-' + type).className = "py-2.5 px-4 font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm transition";
-            renderMatching(type);
-        }
-
-        function renderMatching(filterType) {
-            const container = document.getElementById('matching-list-container');
-            const filtered = matchingData.filter(item => filterType === 'all' || item.type === filterType);
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-2 bg-white p-8 rounded-2xl text-center text-slate-400 border border-slate-200">등록된 매칭 글이 없습니다.</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${item.type === 'request' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}">
-                                ${item.type === 'request' ? '도움 요청' : '도우미 지원'}
-                            </span>
-                            <span class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i>${item.location}</span>
-                        </div>
-                        <h3 class="font-bold text-base text-slate-900 mb-2">${item.title}</h3>
-                        <p class="text-slate-600 text-sm mb-4 line-clamp-2">${item.desc}</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-500">
-                        <span>작성자: ${item.author}</span>
-                        <button onclick="alert('매칭 신청 완료!')" class="bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-indigo-600 hover:text-white transition">
-                            매칭 신청하기
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openMatchingModal() {
-            document.getElementById('matching-modal').classList.remove('hidden');
-            document.getElementById('matching-modal').classList.add('flex');
-        }
-        function closeMatchingModal() {
-            document.getElementById('matching-modal').classList.add('hidden');
-            document.getElementById('matching-modal').classList.remove('flex');
-        }
-
-        function submitMatching(event) {
-            event.preventDefault();
-            const type = document.getElementById('match-type').value;
-            const title = document.getElementById('match-title').value;
-            const location = document.getElementById('match-location').value;
-            const desc = document.getElementById('match-desc').value;
-
-            matchingData.unshift({
-                id: matchingData.length + 1,
-                type, title, location, desc,
-                author: "김민수",
-                status: "모집중"
-            });
-
-            closeMatchingModal();
-            renderMatching('all');
-            alert('성공적으로 등록되었습니다!');
+        // 지역 필터 적용 함수
+        function filterFacilities() {
+            const selectedRegion = document.getElementById('regionFilter').value;
+            renderFacilities(selectedRegion);
         }
     </script>
 </body>
