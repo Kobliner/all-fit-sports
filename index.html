@@ -166,7 +166,6 @@
         let allFacilities = [];
         let infowindow = null;
 
-        // 전국 주요 장애인 체육시설 데이터셋 (404 오류 원인 차단용 안정 데이터)
         const mockFacilities = [
             { name: "서울반다비체육센터", region: "서울", subRegion: "송파구 올림픽로 424", agency: "서울시설공단", lat: 37.5125, lng: 127.1025, phone: "02-2140-5100", voucher: "Y", bandabi: "Y", sports: ["수영", "헬스/피트니스", "다목적체육관"], homepage: "https://www.sisul.or.kr" },
             { name: "곰두리체육센터", region: "서울", subRegion: "노원구 덕릉로70길 98", agency: "한국지체장애인협회", lat: 37.6412, lng: 127.0654, phone: "02-952-6001", voucher: "Y", bandabi: "N", sports: ["수영", "재활스포츠"], homepage: "" },
@@ -201,7 +200,6 @@
             map = new kakao.maps.Map(container, options);
             infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
             
-            // 데이터 바인딩 실행
             loadFacilities();
         }
 
